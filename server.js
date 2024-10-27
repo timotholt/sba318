@@ -4,7 +4,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { router as userRoutes } from './routes/users.js';
 import { router as lobbyRoutes } from './routes/lobby.js';
-import { connectDB } from './config/database.js';
+import { connectDB } from './database/database.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

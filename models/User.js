@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { getDbAdapter } from '../adapters/dbAdapter.js';
+import { getDbEngine } from '../database/selectDbEngine.js';
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -44,7 +44,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 export const User = mongoose.model('User', userSchema);
 
-const db = getDbAdapter(process.env.DB_TYPE || 'memory');
+const db = getDbEngine(process.env.DB_TYPE || 'memory');
 
 export const UserDB = {
   async findOne(query) {
