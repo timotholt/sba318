@@ -1,0 +1,138 @@
+Game Lobby Application Test Plan
+============================
+
+1. Server Startup
+   - Start the server with `npm start`
+   - Verify server starts without errors
+   - Check both database modes:
+     * Set DB_TYPE=memory in .env
+     * Set DB_TYPE=mongodb in .env
+
+2. User Registration Tests
+   - Try registering with mismatched passwords
+     * Expected: Error message "Passwords do not match"
+   - Try registering without username
+     * Expected: Error message "Username and password are required"
+   - Try registering without password
+     * Expected: Error message "Username and password are required"
+   - Try registering with existing username
+     * Expected: Error message "Username already exists"
+   - Register successfully with all fields
+     * Username: testuser1
+     * Nickname: Test User
+     * Password: password123
+     * Expected: Success message and redirect to login
+
+3. Login Tests
+   - Try logging in with incorrect username
+     * Expected: Error message "Invalid username or password"
+   - Try logging in with incorrect password
+     * Expected: Error message "Invalid username or password"
+   - Try logging in with empty fields
+     * Expected: Error message "Please enter both username and password"
+   - Login successfully
+     * Expected: Redirect to lobby screen
+
+4. Settings Tests
+   - Click settings gear icon
+     * Expected: Settings screen opens
+   - Change Nickname:
+     * Enter new nickname
+     * Expected: Success message "Nickname updated successfully!"
+     * Verify nickname updates in lobby game list
+   - Change Password:
+     * Enter wrong current password
+       * Expected: Error message "Current password is incorrect"
+     * Enter mismatched new passwords
+       * Expected: Error message "New passwords do not match"
+     * Change password successfully
+       * Expected: Success message "Password changed successfully!"
+       * Verify can login with new password
+   - Delete Account:
+     * Click without confirmation
+       * Expected: Confirmation dialog appears
+     * Cancel confirmation
+       * Expected: Account remains active
+     * Confirm deletion
+       * Expected: Account deleted, redirect to login
+
+5. Game Lobby Tests
+   - Create game:
+     * Try empty game name
+       * Expected: Error message "Please enter a game name"
+     * Create game with duplicate name
+       * Expected: Error message "A game with this name already exists"
+     * Create game successfully
+       * Expected: Game appears in list with creator's nickname
+   - Delete game:
+     * Try deleting other user's game
+       * Expected: Delete button not visible
+     * Delete own game
+       * Expected: Game removed from list
+   - Join game:
+     * Join existing game
+       * Expected: Redirect to game screen
+     * Try joining full game (if implemented)
+       * Expected: Error message about game being full
+
+6. Logout Tests
+   - Click logout button
+     * Expected: Return to login screen
+     * Verify cannot access lobby without logging in again
+   - Close browser and reopen
+     * Expected: User should need to log in again
+
+7. MongoDB Admin Tests
+   - Click MongoDB Admin link
+     * Expected: Opens MongoDB admin URL in new tab
+
+8. UI/UX Tests
+   - Verify all screens are responsive
+   - Check error message visibility and timeout
+   - Verify focus moves correctly between input fields
+   - Test Enter key submission on all forms
+   - Verify back buttons work correctly
+   - Check refresh timer in lobby works
+
+9. Database Switch Tests
+   - Test with DB_TYPE=memory:
+     * Verify data persists during session
+     * Verify data resets on server restart
+   - Test with DB_TYPE=mongodb:
+     * Verify data persists across server restarts
+     * Verify data is stored in MongoDB
+
+10. Edge Cases
+    - Test with very long usernames/nicknames
+    - Test with special characters in all fields
+    - Test rapid game creation/deletion
+    - Test multiple simultaneous users
+    - Test with network disconnection
+    - Test with slow network connection
+
+Test Data Sets
+=============
+
+Test Users:
+1. Primary Test User
+   - Username: testuser1
+   - Password: password123
+   - Nickname: Test User One
+
+2. Secondary Test User
+   - Username: testuser2
+   - Password: password456
+   - Nickname: Test User Two
+
+Test Games:
+1. Basic Game
+   - Name: Test Game 1
+   - Creator: testuser1
+
+2. Long Name Game
+   - Name: This is a very long game name to test display
+   - Creator: testuser2
+
+3. Special Characters Game
+   - Name: @#$% Special Game !@#
+   - Creator: testuser1
