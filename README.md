@@ -79,64 +79,7 @@ Server will start on port 3000 (or PORT from environment variables)
 
 ## API Documentation
 
-### Authentication
-
-#### Register User
-```
-POST /user/register
-{
-  "username": "string",
-  "password": "string",
-  "nickname": "string" (optional)
-}
-```
-
-#### Login
-```
-POST /user/login
-{
-  "username": "string",
-  "password": "string"
-}
-```
-
-### Game Lobby
-
-#### Get Games
-```
-GET /lobby
-```
-
-#### Create Game
-```
-POST /lobby
-{
-  "name": "string",
-  "creator": "string",
-  "maxPlayers": number (1-4)
-}
-```
-
-#### Join Game
-```
-POST /lobby/:id/join
-{
-  "username": "string"
-}
-```
-
-#### Leave Game
-```
-POST /lobby/:id/leave
-{
-  "username": "string"
-}
-```
-
-#### Delete Game
-```
-DELETE /lobby/:id?username=string
-```
+- The API is RESTFUL... the documentation can be found in api-reference.txt
 
 ## Database System
 

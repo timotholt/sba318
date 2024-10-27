@@ -20,16 +20,35 @@ export class InMemoryDbEngine extends BaseDbEngine {
     );
   }
 
-  async create(collection, data) {
+async create(collection, data) {
     const collectionName = collection.modelName;
     if (!this.storage.has(collectionName)) {
-      this.storage.set(collectionName, []);
+        this.storage.set(collectionName, []);
     }
     const collectionData = this.storage.get(collectionName);
-    const newDocument = { ...data, _id: Date.now().toString() };
+    
+    // Ensure dates are stored as Date objects
+    const newDocument = { 
+        ...data, 
+        _id: Date.now().toString(),
+        created: data.created ? new Date(data.created) : new Date(),
+        createdAt: data.createdAt ? new Date(data.createdAt) : new Date()
+    };
+    
     collectionData.push(newDocument);
     return newDocument;
-  }
+}
+  
+  // async create(collection, data) {
+  //   const collectionName = collection.modelName;
+  //   if (!this.storage.has(collectionName)) {
+  //     this.storage.set(collectionName, []);
+  //   }
+  //   const collectionData = this.storage.get(collectionName);
+  //   const newDocument = { ...data, _id: Date.now().toString() };
+  //   collectionData.push(newDocument);
+  //   return newDocument;
+  // }
 
   async update(collection, query, data) {
     const collectionData = this.storage.get(collection.modelName) || [];

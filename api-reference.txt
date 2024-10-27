@@ -95,18 +95,17 @@ Profile Management Endpoints
    - 500: Failed to change password
 
 3. Delete Account
-   Endpoint: POST /user/delete-account
+   Endpoint: DELETE /user/:username
    Description: Permanently deletes user account and removes from all games
-   Request Body:
-   {
-     "username": "string"
-   }
+   URL Parameters:
+   - username: User to delete
    Response:
    {
      "success": true
    }
    Errors:
    - 404: User not found
+   - 400: Cannot delete account with active games
    - 500: Failed to delete account
 
 Game Lobby Endpoints
@@ -115,6 +114,8 @@ Game Lobby Endpoints
 1. Get All Games
    Endpoint: GET /lobby
    Description: Retrieves list of all active games with player nicknames
+   Query Parameters:
+   - username: Optional. If provided, returns only games where user is creator or player
    Response:
    [
      {
@@ -230,7 +231,8 @@ Error Response Format
 All error responses follow this format:
 {
   "success": false,
-  "message": "string"    // Human-readable error message
+  "message": "string",    // Human-readable error message
+  "stack": "string"       // Only in development mode
 }
 
 HTTP Status Codes
@@ -256,13 +258,60 @@ Notes
 10. Password changes require current password verification
 11. Account deletion removes user from all active games
 12. Game creator cannot be removed from their own game
+13. Account deletion is prevented if user has active games with players
 
-Security Notes
--------------
-1. Passwords are hashed using bcrypt
-2. All inputs are sanitized and validated
-3. MongoDB injection protection is enabled
-4. Rate limiting is applied to all endpoints
-5. Request size is limited to 10kb
-6. Session handling is stateless
-7. CORS is enabled for all origins
+Security Features
+---------------
+1. Request size limited to 10kb
+2. MongoDB injection protection enabled
+3. CORS enabled for all origins
+4. Password fields redacted in logs
+5. Stack traces only shown in development
+6. Validation middleware for username
+7. Custom error handling middleware
+8. Request logging with sanitized data
+9. Response time tracking
+10. IP address logging
+
+Environment Variables
+-------------------
+- PORT: Server port (default: 3000)
+- DB_TYPE: Database type ('memory' or 'mongodb')
+- MONGODB_URI: MongoDB connection string
+- MONGO_ADMIN_URL: MongoDB admin interface URL
+- NODE_ENV: Environment ('development' or 'production')
+
+Database Engines
+--------------
+1. In-Memory Database (development)
+   - Data persists only during server runtime
+   - No external dependencies
+   - Fast performance
+   - Data lost on server restart
+
+2. MongoDB (production)
+   - Persistent data storage
+   - Automatic reconnection
+   - Schema validation
+   - Production ready
+
+Middleware Stack
+--------------
+1. Request Size Limit (10kb)
+2. URL Encoded Parser
+3. MongoDB Sanitizer
+4. CORS Handler
+5. Request Logger
+6. Username Validator
+7. Error Handlers (404, Global)
+
+Client Integration
+----------------
+1. Regular polling recommended (30s)
+2. Handle all error responses
+3. Implement exponential backoff
+4. Validate all inputs
+5. Sanitize displayed content
+6. Handle network errors
+7. Track session state
+8. Cache responses when appropriate

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Server Admin Dashboard</title>
+    <link rel="stylesheet" href="/admin/styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <header class="dashboard-header">
+            <h1>Game Server Statistics</h1>
+            <div id="lastUpdated" class="last-updated">
+                Last updated: <%= moment.toLocaleTimeString() %>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <div id="totalUsers" class="stat-value"><%= stats.totalUsers %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Games</h3>
+                <div id="totalGames" class="stat-value"><%= stats.totalGames %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Games</h3>
+                <div id="activeGames" class="stat-value"><%= stats.activeGames %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Players</h3>
+                <div id="totalPlayers" class="stat-value"><%= stats.totalPlayers %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Players/Game</h3>
+                <div id="avgPlayers" class="stat-value"><%= stats.averagePlayersPerGame %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Most Active Creator</h3>
+                <div id="mostActiveCreator" class="stat-value">
+                    <% if (stats.mostActiveCreator) { %>
+                        <%= stats.mostActiveCreator.username %> 
+                        (<%= stats.mostActiveCreator.games %> games)
+                    <% } else { %>
+                        None
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-tables">
+            <section class="games-section">
+                <h2>Active Games</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Creator</th>
+                            <th>Players</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% games.forEach(game => { %>
+                            <tr>
+                                <td><%= game.name %></td>
+                                <td><%= game.creatorNickname %></td>
+                                <td><%= game.players.length %>/<%= game.maxPlayers %></td>
+                                <td><%= new Date(game.created).toLocaleString() %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="users-section">
+                <h2>Recent Users</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Nickname</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.slice(-10).forEach(user => { %>
+                            <tr>
+                                <td><%= user.username %></td>
+                                <td><%= user.nickname %></td>
+                                <td><%= new Date(user.createdAt).toLocaleString() %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+    <script src="/admin/dashboard.js"></script>
+</body>
+</html>

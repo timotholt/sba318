@@ -49,6 +49,10 @@ export const UserDB = {
     return await db.getEngine().findOne(User, query);
   },
 
+  async findAll() {
+    return await db.getEngine().find(User, {});
+  },
+
   async create(userData) {
     return await db.getEngine().create(User, userData);
   },
