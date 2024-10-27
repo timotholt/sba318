@@ -21,10 +21,22 @@ router.get('/', async (req, res, next) => {
                 game.players.some(player => player.userId === userId)
               )
             : games;
+
+        // Populate creator nicknames
+        const gamesWithCreatorInfo = await Promise.all(filteredGames.map(async game => {
+            const creator = await UserDB.findById(game.creator);
+
+console.log(`lobby.js line 29, creator = ${creator}, creator.nickname = ${creator.nickname}`);
+          
+            return {
+                ...game,
+                creatorNickname: creator ? creator.nickname : 'Unknown User'
+            };
+        }));
         
         // No need to fetch nicknames separately as they're stored with players
-        console.log(`Total games: ${filteredGames.length}`);
-        res.json(filteredGames);
+        console.log(`Total games: ${gamesWithCreatorInfo.length}`);
+        res.json(gamesWithCreatorInfo);
     } catch (error) {
         next(error);
     }
@@ -56,7 +68,6 @@ router.post('/', async (req, res, next) => {
         const newGame = await GameStateDB.create({
             name,
             creator: creatorUser.userId,
-            creatorNickname: creatorUser.nickname,
             maxPlayers: maxPlayersNum,
             players: []
         });

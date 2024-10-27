@@ -18,14 +18,6 @@ const gameStateSchema = new mongoose.Schema({
     type: String,  // This stores userId
     required: true
   },
-  creatorNickname: {
-    type: String,
-    required: true
-  },
-  creatorDeleted: {
-    type: Boolean,
-    default: false
-  },
   maxPlayers: {
     type: Number,
     required: true,
@@ -34,12 +26,7 @@ const gameStateSchema = new mongoose.Schema({
     default: 4
   },
   players: [{
-    userId: String,
-    nickname: String,
-    deleted: {
-      type: Boolean,
-      default: false
-    }
+    type: String  // Array of userIds
   }],
   created: {
     type: Date,
@@ -78,7 +65,7 @@ export const GameStateDB = {
     return await db.getEngine().find(GameState, { creator: userId });
   },
 
-  async addPlayer(gameId, userId, nickname) {
+  async addPlayer(gameId, userId) {
     const game = await this.findOne({ id: gameId });
     if (!game) return null;
 
@@ -86,8 +73,8 @@ export const GameStateDB = {
       throw new Error('Game is full');
     }
 
-    if (!game.players.find(p => p.userId === userId)) {
-      game.players.push({ userId, nickname, deleted: false });
+    if (!game.players.includes(userId)) {
+      game.players.push(userId);
       await this.update({ id: gameId }, { players: game.players });
     }
     return game;
@@ -97,57 +84,13 @@ export const GameStateDB = {
     const game = await this.findOne({ id: gameId });
     if (!game) return null;
 
-    game.players = game.players.filter(p => p.userId !== userId);
+    game.players = game.players.filter(id => id !== userId);
     await this.update({ id: gameId }, { players: game.players });
     return game;
   },
 
   async isPlayerInGame(gameId, userId) {
     const game = await this.findOne({ id: gameId });
-    return game ? game.players.some(p => p.userId === userId && !p.deleted) : false;
-  },
-
-  async updatePlayerNickname(userId, newNickname) {
-    const games = await this.findAll();
-    for (const game of games) {
-      const player = game.players.find(p => p.userId === userId);
-      if (player) {
-        player.nickname = newNickname;
-        await this.update({ id: game.id }, { players: game.players });
-      }
-      if (game.creator === userId) {
-        await this.update({ id: game.id }, { creatorNickname: newNickname });
-      }
-    }
-  },
-
-  async markPlayerDeleted(userId) {
-    const games = await this.findAll();
-    for (const game of games) {
-      let updated = false;
-      
-      // Update player if they're in the game
-      const player = game.players.find(p => p.userId === userId);
-      if (player) {
-        player.deleted = true;
-        player.nickname = "Deleted User";
-        updated = true;
-      }
-
-      // Update creator if it's their game
-      if (game.creator === userId) {
-        game.creatorDeleted = true;
-        game.creatorNickname = "Deleted User";
-        updated = true;
-      }
-
-      if (updated) {
-        await this.update({ id: game.id }, { 
-          players: game.players,
-          creatorDeleted: game.creatorDeleted,
-          creatorNickname: game.creatorNickname
-        });
-      }
-    }
+    return game ? game.players.includes(userId) : false;
   }
 };

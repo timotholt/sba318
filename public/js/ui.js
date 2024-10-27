@@ -58,20 +58,25 @@ export function renderGamesList(games, onDelete, onJoin) {
         
         const gameInfo = document.createElement('div');
         gameInfo.className = 'game-info';
+
+        // Get creator's nickname from the user list
+        const creatorNickname = game.creatorNickname || 'Unknown User';
+        
         gameInfo.innerHTML = `
             <div class="game-header">
                 <h3>${game.name}</h3>
-                <span class="creator">Created by: ${game.creatorNickname}</span>
+                <span class="creator">Created by: ${creatorNickname}</span>
             </div>
             <div class="players-list">
                 Players (${game.players.length}/${game.maxPlayers}): 
-                ${game.players.map(player => player.nickname).join(', ')}
+                ${game.players.map(player => player.nickname || 'Unknown Player').join(', ')}
             </div>
         `;
         
         const buttonsDiv = document.createElement('div');
         buttonsDiv.className = 'game-buttons';
 
+        // Only show join button if game isn't full
         if (game.players.length < game.maxPlayers) {
             const joinButton = document.createElement('button');
             joinButton.textContent = 'Join Game';
@@ -80,6 +85,7 @@ export function renderGamesList(games, onDelete, onJoin) {
             buttonsDiv.appendChild(joinButton);
         }
         
+        // Only show delete button if current user is the creator
         if (game.creator === window.globalUserId) {
             const deleteButton = document.createElement('button');
             deleteButton.textContent = '🗑️ Delete';
@@ -94,98 +100,31 @@ export function renderGamesList(games, onDelete, onJoin) {
     });
 }
 
+export function renderChatMessages(messages, containerId) {
+    const chatMessages = document.getElementById(containerId);
+    if (!chatMessages) return;
 
-// export function showScreen(screens, screenName) {
-//     clearAllErrors();
-//     Object.values(screens).forEach(screen => {
-//         screen.classList.add('hidden');
-//     });
-//     screens[screenName].classList.remove('hidden');
+    // Sort messages by timestamp in ascending order (oldest first)
+    const sortedMessages = [...messages].sort((a, b) => 
+        new Date(a.timestamp) - new Date(b.timestamp)
+    );
 
-//     const focusMap = {
-//         login: 'username',
-//         register: 'registerUsername',
-//         lobby: 'gameName',
-//         settings: 'currentNickname'
-//     };
+    chatMessages.innerHTML = sortedMessages.map(msg => `
+        <div class="chat-message">
+            <span class="chat-nickname">${msg.nickname}:</span>
+            ${msg.message}
+            <span class="chat-timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+        </div>
+    `).join('');
 
-//     const inputToFocus = focusMap[screenName];
-//     if (inputToFocus) {
-//         document.getElementById(inputToFocus).focus();
-//     }
-// }
+    // Scroll to bottom to show newest messages
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-// const errorContainers = {
-//     login: document.getElementById('loginError'),
-//     register: document.getElementById('registerError'),
-//     lobby: document.getElementById('lobbyError'),
-//     game: document.getElementById('gameError'),
-//     settings: document.getElementById('settingsError')
-// };
+export function updateRefreshTimer(timeLeft) {
+    const timerElement = document.getElementById('refreshTimer');
+    if (timerElement) {
+        timerElement.textContent = `Next refresh in ${timeLeft} second${timeLeft !== 1 ? 's' : ''}`;
+    }
+}
 
-// export function clearAllErrors() {
-//     Object.keys(errorContainers).forEach(key => {
-//         showError('', key);
-//     });
-// }
-
-// export function showError(message, screenName = 'login') {
-//     const errorDiv = errorContainers[screenName];
-//     if (errorDiv) {
-//         errorDiv.textContent = message;
-//         errorDiv.style.display = message ? 'block' : 'none';
-        
-//         setTimeout(() => {
-//             if (message.includes('successfully')) {
-//                 errorDiv.style.display = 'none';
-//             }
-//         }, 3000);
-//     }
-// }
-
-// export function renderGamesList(games, onDelete, onJoin) {
-//     const gamesListDiv = document.getElementById('gamesList');
-//     if (!gamesListDiv) return;
-
-//     gamesListDiv.innerHTML = games.length ? '' : '<p>No games available</p>';
-    
-//     games.forEach(game => {
-//         const gameElement = document.createElement('div');
-//         gameElement.className = 'game-item';
-        
-//         const gameInfo = document.createElement('div');
-//         gameInfo.className = 'game-info';
-//         gameInfo.innerHTML = `
-//             <div class="game-header">
-//                 <h3>${game.name}</h3>
-//                 <span class="creator">Created by: ${game.creatorNickname}</span>
-//             </div>
-//             <div class="players-list">
-//                 Players (${game.players.length}/${game.maxPlayers}): ${game.playerNicknames.join(', ')}
-//             </div>
-//         `;
-        
-//         const buttonsDiv = document.createElement('div');
-//         buttonsDiv.className = 'game-buttons';
-
-//         if (game.players.length < game.maxPlayers) {
-//             const joinButton = document.createElement('button');
-//             joinButton.textContent = 'Join Game';
-//             joinButton.className = 'join-btn';
-//             joinButton.onclick = () => onJoin(game.id);
-//             buttonsDiv.appendChild(joinButton);
-//         }
-        
-//         if (game.creator === window.globalUsername) {
-//             const deleteButton = document.createElement('button');
-//             deleteButton.textContent = '🗑️ Delete';
-//             deleteButton.className = 'delete-btn';
-//             deleteButton.onclick = () => onDelete(game.id);
-//             buttonsDiv.appendChild(deleteButton);
-//         }
-        
-//         gameElement.appendChild(gameInfo);
-//         gameElement.appendChild(buttonsDiv);
-//         gamesListDiv.appendChild(gameElement);
-//     });
-// }

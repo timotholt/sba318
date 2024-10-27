@@ -30,7 +30,6 @@ class GameApp {
         this.pollInterval = null;
         this.refreshTimer = null;      // The number we show on the screen
 
-
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initialize());
         } else {
@@ -140,16 +139,16 @@ class GameApp {
         const password = document.getElementById('registerPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
-       // Client-side validation
-    if (!validation.username.pattern.test(username)) {
-        showError(validation.username.message, 'register');
-        return;
-    }
+        // Client-side validation
+        if (!validation.username.pattern.test(username)) {
+            showError(validation.username.message, 'register');
+            return;
+        }
 
-    if (!validation.password.pattern.test(password)) {
-        showError(validation.password.message, 'register');
-        return;
-    }
+        if (!validation.password.pattern.test(password)) {
+            showError(validation.password.message, 'register');
+            return;
+        }
         
         if (!username || !password) {
             showError('Please enter both username and password', 'register');
@@ -180,16 +179,16 @@ class GameApp {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
 
-   // Client-side validation
-    if (!validation.username.pattern.test(username)) {
-        showError(validation.username.message, 'login');
-        return;
-    }
+        // Client-side validation
+        if (!validation.username.pattern.test(username)) {
+            showError(validation.username.message, 'login');
+            return;
+        }
 
-    if (!validation.password.pattern.test(password)) {
-        showError(validation.password.message, 'login');
-        return;
-    }
+        if (!validation.password.pattern.test(password)) {
+            showError(validation.password.message, 'login');
+            return;
+        }
       
         if (!username || !password) {
             showError('Please enter both username and password', 'login');
@@ -241,8 +240,8 @@ class GameApp {
 
         if (!validation.nickname.pattern.test(nickname)) {
             showError(validation.nickname.message, 'settings');
-        return;
-    }
+            return;
+        }
 
         try {
             const response = await api.changeNickname(window.globalUserId, nickname);
@@ -352,7 +351,7 @@ class GameApp {
         
         if (message) {
             try {
-                await api.sendLobbyMessage(message, window.globalUserId);
+                await api.sendLobbyMessage(message);
                 input.value = '';
                 await this.updateLobbyChat();
             } catch (error) {
@@ -367,7 +366,7 @@ class GameApp {
         
         if (message && this.currentGameId) {
             try {
-                await api.sendGameMessage(this.currentGameId, message, window.globalUserId);
+                await api.sendGameMessage(this.currentGameId, message);
                 input.value = '';
                 await this.updateGameChat();
             } catch (error) {
@@ -421,6 +420,10 @@ class GameApp {
             clearInterval(this.pollInterval);
             this.pollInterval = null;
         }
+        if (this.chatInterval) {
+            clearInterval(this.chatInterval);
+            this.chatInterval = null;
+        }
         if (this.refreshTimer) {
             clearInterval(this.refreshTimer);
             this.refreshTimer = null;
@@ -444,13 +447,13 @@ class GameApp {
         this.refreshTimer = setInterval(updateTimer, 1000);
     }
 
-  async updateChat() {
-    if (this.currentGameId) {
-        await this.updateGameChat();
-    } else {
-        await this.updateLobbyChat();
+    async updateChat() {
+        if (this.currentGameId) {
+            await this.updateGameChat();
+        } else {
+            await this.updateLobbyChat();
+        }
     }
-}
 
     async updateGamesList() {
         try {
@@ -468,5 +471,4 @@ class GameApp {
     }
 }
 
-// TIM - DO NOT DELETE THIS LINE
 new GameApp();
