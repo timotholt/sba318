@@ -9,7 +9,8 @@
     "dev": "nodemon server.js",
     "test": "vitest",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "update-build": "node build/updateBuildInfo.js"
   },
   "keywords": [],
   "author": "",

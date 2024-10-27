@@ -12,8 +12,8 @@ Authentication Endpoints
    Description: Creates a new user account
    Request Body:
    {
-     "username": "string",     // Required
-     "password": "string",     // Required
+     "username": "string",     // Required, 3-30 chars
+     "password": "string",     // Required, min 6 chars
      "nickname": "string"      // Optional, defaults to username
    }
    Response: 
@@ -37,7 +37,7 @@ Authentication Endpoints
    Response:
    {
      "success": true,
-     "nickname": "string"
+     "nickname": "string"     // User's current nickname
    }
    Errors:
    - 401: Invalid username or password
@@ -67,7 +67,7 @@ Profile Management Endpoints
    Request Body:
    {
      "username": "string",
-     "nickname": "string"
+     "nickname": "string"     // 1-30 chars
    }
    Response:
    {
@@ -84,7 +84,7 @@ Profile Management Endpoints
    {
      "username": "string",
      "currentPassword": "string",
-     "newPassword": "string"
+     "newPassword": "string"  // Min 6 chars
    }
    Response:
    {
@@ -94,23 +94,38 @@ Profile Management Endpoints
    - 401: Current password is incorrect
    - 500: Failed to change password
 
+3. Delete Account
+   Endpoint: POST /user/delete-account
+   Description: Permanently deletes user account and removes from all games
+   Request Body:
+   {
+     "username": "string"
+   }
+   Response:
+   {
+     "success": true
+   }
+   Errors:
+   - 404: User not found
+   - 500: Failed to delete account
+
 Game Lobby Endpoints
 ------------------
 
 1. Get All Games
    Endpoint: GET /lobby
-   Description: Retrieves list of all active games
+   Description: Retrieves list of all active games with player nicknames
    Response:
    [
      {
-       "id": "string",
+       "id": "string",        // UUID v4
        "name": "string",
-       "creator": "string",
+       "creator": "string",   // Username of creator
        "creatorNickname": "string",
-       "maxPlayers": number,
-       "players": ["string"],
-       "playerNicknames": ["string"],
-       "created": "date"
+       "maxPlayers": number,  // 1-4
+       "players": ["string"], // Array of usernames
+       "playerNicknames": ["string"], // Array of player nicknames
+       "created": "date"      // ISO 8601
      }
    ]
    Errors:
@@ -129,27 +144,21 @@ Game Lobby Endpoints
    {
      "success": true,
      "game": {
-       "id": "string",
-       "name": "string",
-       "creator": "string",
-       "creatorNickname": "string",
-       "maxPlayers": number,
-       "players": [],
-       "playerNicknames": [],
-       "created": "date"
+       // Full game object (see GET /lobby response)
      }
    }
    Errors:
    - 400: Game name and creator are required
    - 400: Max players must be between 1 and 4
    - 400: Game name already exists
+   - 404: Creator not found
    - 500: Failed to create game
 
 3. Join Game
    Endpoint: POST /lobby/:id/join
    Description: Adds user to a game
    URL Parameters:
-   - id: Game ID
+   - id: Game ID (UUID)
    Request Body:
    {
      "username": "string"
@@ -171,7 +180,7 @@ Game Lobby Endpoints
    Endpoint: POST /lobby/:id/leave
    Description: Removes user from a game
    URL Parameters:
-   - id: Game ID
+   - id: Game ID (UUID)
    Request Body:
    {
      "username": "string"
@@ -192,7 +201,7 @@ Game Lobby Endpoints
    Endpoint: DELETE /lobby/:id
    Description: Removes a game (creator only)
    URL Parameters:
-   - id: Game ID
+   - id: Game ID (UUID)
    Query Parameters:
    - username: Creator's username
    Response:
@@ -237,8 +246,23 @@ Notes
 -----
 1. All endpoints require Content-Type: application/json header
 2. Dates are returned in ISO 8601 format
-3. Game IDs are unique strings generated from timestamps
+3. Game IDs are UUIDs generated using crypto.randomUUID()
 4. Nicknames are used for display purposes in the game lobby
 5. The server supports both in-memory and MongoDB storage
 6. Real-time updates require polling the /lobby endpoint
+7. Maximum players per game is configurable from 1-4
+8. Player lists maintain both usernames and nicknames
+9. Database type is configured via DB_TYPE environment variable
+10. Password changes require current password verification
+11. Account deletion removes user from all active games
+12. Game creator cannot be removed from their own game
 
+Security Notes
+-------------
+1. Passwords are hashed using bcrypt
+2. All inputs are sanitized and validated
+3. MongoDB injection protection is enabled
+4. Rate limiting is applied to all endpoints
+5. Request size is limited to 10kb
+6. Session handling is stateless
+7. CORS is enabled for all origins

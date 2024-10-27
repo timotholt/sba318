@@ -24,13 +24,13 @@ app.use(function (req, res, next) {
 app.use(morgan('dev'));
 
 // Security middleware
-// app.use(mongoSanitize());
+app.use(mongoSanitize());
 
 // Middleware for parsing JSON bodies
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from public directory
+// Serve static files from client directory
 app.use(express.static('public'));
 
 // API Routes
@@ -60,6 +60,11 @@ try {
 }
 
 // Start listening for reqeusts!
+import { buildInfo } from './buildInfo.js';
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+
+// Add to your UI somewhere:
+    console.log(`Game Server Version: ${buildInfo.version} (Built: ${buildInfo.buildDate})`);
 });

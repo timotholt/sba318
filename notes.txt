@@ -22,44 +22,6 @@ AWwyFkk7iibN9fz7
    - Update MONGODB_URI with your connection string
    - Format: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
 
-SECURITY FEATURES
-----------------
-- Password hashing with bcrypt
-- Rate limiting (100 requests per 15 minutes)
-- MongoDB query sanitization
-- Request size limiting (10kb)
-- Mongoose schema validation
-- Auto-reconnect on MongoDB disconnection
-
-API ENDPOINTS
-------------
-POST /player/register
-- Register new user
-- Required: username, password
-
-POST /player/login
-- Login existing user
-- Required: username, password
-
-POST /player/logout
-- Logout user
-- Required: username
-
-GET /lobby
-- Get all games
-
-POST /lobby
-- Create new game
-- Required: name, creator
-
-DELETE /lobby/:id
-- Delete game
-- Required: gameId, username (query param)
-
-POST /lobby/:id/join
-- Join existing game
-- Required: gameId, username
-
 ============================
 
 const mongoose = require('mongoose');

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Run the build info update script
+npm run update-build
+
+# Add the updated buildInfo.js to the commit
+git add buildInfo.js

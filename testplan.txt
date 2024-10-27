@@ -1,138 +1,309 @@
 Game Lobby Application Test Plan
 ============================
 
-1. Server Startup
-   - Start the server with `npm start`
-   - Verify server starts without errors
-   - Check both database modes:
-     * Set DB_TYPE=memory in .env
-     * Set DB_TYPE=mongodb in .env
+1. Database Configuration Tests
+-----------------------------
+- Test in-memory database initialization
+- Test MongoDB database initialization
+- Test database connection error handling
+- Test database reconnection logic
+- Verify database type switching via .env
+- Test database operations during connection loss
 
 2. User Registration Tests
-   - Try registering with mismatched passwords
-     * Expected: Error message "Passwords do not match"
-   - Try registering without username
-     * Expected: Error message "Username and password are required"
-   - Try registering without password
-     * Expected: Error message "Username and password are required"
-   - Try registering with existing username
-     * Expected: Error message "Username already exists"
-   - Register successfully with all fields
-     * Username: testuser1
-     * Nickname: Test User
-     * Password: password123
-     * Expected: Success message and redirect to login
+-------------------------
+a) Input Validation
+   - Empty username
+   - Empty password
+   - Username with spaces only
+   - Username with special characters
+   - Password too short (if min length set)
+   - Username too long (max 30 chars)
+   - Password too long (if max length set)
+   - Valid username/password combination
+   - Unicode characters in username/nickname
 
-3. Login Tests
-   - Try logging in with incorrect username
-     * Expected: Error message "Invalid username or password"
-   - Try logging in with incorrect password
-     * Expected: Error message "Invalid username or password"
-   - Try logging in with empty fields
-     * Expected: Error message "Please enter both username and password"
-   - Login successfully
-     * Expected: Redirect to lobby screen
+b) Duplicate Prevention
+   - Register with existing username
+   - Register with existing nickname
+   - Case sensitivity tests (e.g., "User" vs "user")
 
-4. Settings Tests
-   - Click settings gear icon
-     * Expected: Settings screen opens
-   - Change Nickname:
-     * Enter new nickname
-     * Expected: Success message "Nickname updated successfully!"
-     * Verify nickname updates in lobby game list
-   - Change Password:
-     * Enter wrong current password
-       * Expected: Error message "Current password is incorrect"
-     * Enter mismatched new passwords
-       * Expected: Error message "New passwords do not match"
-     * Change password successfully
-       * Expected: Success message "Password changed successfully!"
-       * Verify can login with new password
-   - Delete Account:
-     * Click without confirmation
-       * Expected: Confirmation dialog appears
-     * Cancel confirmation
-       * Expected: Account remains active
-     * Confirm deletion
-       * Expected: Account deleted, redirect to login
+c) Optional Fields
+   - Register without nickname (should default to username)
+   - Register with empty nickname
+   - Register with very long nickname
 
-5. Game Lobby Tests
-   - Create game:
-     * Try empty game name
-       * Expected: Error message "Please enter a game name"
-     * Create game with duplicate name
-       * Expected: Error message "A game with this name already exists"
-     * Create game successfully
-       * Expected: Game appears in list with creator's nickname
-   - Delete game:
-     * Try deleting other user's game
-       * Expected: Delete button not visible
-     * Delete own game
-       * Expected: Game removed from list
-   - Join game:
-     * Join existing game
-       * Expected: Redirect to game screen
-     * Try joining full game (if implemented)
-       * Expected: Error message about game being full
+3. Authentication Tests
+----------------------
+a) Login Validation
+   - Login with non-existent user
+   - Login with wrong password
+   - Login with correct credentials
+   - Login with case variations
+   - Login with leading/trailing spaces
+   - Empty credentials
+   - SQL injection attempts
+   - NoSQL injection attempts
 
-6. Logout Tests
-   - Click logout button
-     * Expected: Return to login screen
-     * Verify cannot access lobby without logging in again
-   - Close browser and reopen
-     * Expected: User should need to log in again
+b) Session Management
+   - Multiple simultaneous logins
+   - Login after account deletion
+   - Login after password change
 
-7. MongoDB Admin Tests
-   - Click MongoDB Admin link
-     * Expected: Opens MongoDB admin URL in new tab
+4. Profile Management Tests
+--------------------------
+a) Nickname Changes
+   - Change to valid new nickname
+   - Change to existing nickname
+   - Empty nickname
+   - Very long nickname
+   - Special characters in nickname
+   - Unicode characters in nickname
+   - Verify nickname updates in game list
 
-8. UI/UX Tests
-   - Verify all screens are responsive
-   - Check error message visibility and timeout
-   - Verify focus moves correctly between input fields
-   - Test Enter key submission on all forms
-   - Verify back buttons work correctly
-   - Check refresh timer in lobby works
+b) Password Changes
+   - Change with correct current password
+   - Change with incorrect current password
+   - New password same as old
+   - Empty new password
+   - Password complexity requirements
+   - Cancel password change
 
-9. Database Switch Tests
-   - Test with DB_TYPE=memory:
-     * Verify data persists during session
-     * Verify data resets on server restart
-   - Test with DB_TYPE=mongodb:
-     * Verify data persists across server restarts
-     * Verify data is stored in MongoDB
+c) Account Deletion
+   - Delete account while in game
+   - Delete account with created games
+   - Delete non-existent account
+   - Cancel account deletion
+   - Verify cleanup of all user data
 
-10. Edge Cases
-    - Test with very long usernames/nicknames
-    - Test with special characters in all fields
-    - Test rapid game creation/deletion
-    - Test multiple simultaneous users
-    - Test with network disconnection
-    - Test with slow network connection
+5. Game Management Tests
+-----------------------
+a) Game Creation
+   - Create with valid name
+   - Create with duplicate name
+   - Create with empty name
+   - Create with special characters
+   - Create with max players (1-4)
+   - Create with invalid max players
+   - Create multiple games
+   - Create game while in another game
+
+b) Game Joining
+   - Join available game
+   - Join full game
+   - Join non-existent game
+   - Join game multiple times
+   - Join while in another game
+   - Join as game creator
+   - Join with different player counts
+   - Verify player list updates
+
+c) Game Leaving
+   - Leave as regular player
+   - Leave as creator
+   - Leave non-joined game
+   - Leave non-existent game
+   - Leave multiple times
+   - Verify player list updates
+   - Test auto-leave on logout
+   - Test auto-leave on account deletion
+
+d) Game Deletion
+   - Delete as creator
+   - Delete as non-creator
+   - Delete with players in game
+   - Delete non-existent game
+   - Delete multiple games
+   - Verify cleanup of game data
+
+6. Real-time Updates Tests
+-------------------------
+- Verify game list polling
+- Test polling interval accuracy
+- Test updates with multiple clients
+- Verify player list updates
+- Test refresh timer display
+- Test concurrent game modifications
+- Test update conflicts
+
+7. UI/UX Tests
+-------------
+a) Navigation
+   - All screen transitions
+   - Back button behavior
+   - Refresh behavior
+   - Browser navigation
+   - Tab/window closing
+
+b) Form Handling
+   - Enter key submission
+   - Form field focus
+   - Input validation feedback
+   - Error message display/timeout
+   - Success message display/timeout
+
+c) Responsive Design
+   - Mobile layout
+   - Tablet layout
+   - Desktop layout
+   - Different screen sizes
+   - Orientation changes
+   - Font scaling
+   - Button sizing/spacing
+
+8. Error Handling Tests
+----------------------
+a) Network Errors
+   - Server disconnection
+   - Slow network
+   - Request timeout
+   - Invalid responses
+   - Partial responses
+
+b) Input Validation
+   - XSS attempts
+   - SQL injection
+   - NoSQL injection
+   - Invalid JSON
+   - Oversized requests
+   - Invalid characters
+
+c) Race Conditions
+   - Rapid form submission
+   - Multiple simultaneous requests
+   - Concurrent game updates
+   - Database deadlocks
+
+9. Performance Tests
+-------------------
+- Load testing (multiple users)
+- Stress testing (rapid requests)
+- Memory usage monitoring
+- Database query performance
+- Response time measurements
+- Polling impact assessment
+- Connection pool usage
+
+10. Security Tests
+-----------------
+a) Authentication
+   - Session handling
+   - Password hashing
+   - Token validation
+   - CSRF protection
+   - XSS prevention
+
+b) Authorization
+   - Route protection
+   - Resource access control
+   - API endpoint security
+   - Database access control
+
+c) Data Validation
+   - Input sanitization
+   - Output encoding
+   - File upload handling
+   - Content security policy
+
+11. Integration Tests
+--------------------
+- API endpoint integration
+- Database integration
+- Frontend/backend integration
+- WebSocket integration
+- Third-party service integration
+- Error handling integration
+
+12. Compatibility Tests
+----------------------
+a) Browsers
+   - Chrome
+   - Firefox
+   - Safari
+   - Edge
+   - Mobile browsers
+
+b) Operating Systems
+   - Windows
+   - macOS
+   - Linux
+   - iOS
+   - Android
+
+13. Accessibility Tests
+----------------------
+- Screen reader compatibility
+- Keyboard navigation
+- Color contrast
+- Font sizing
+- ARIA attributes
+- Focus management
+- Alternative text
+
+14. Recovery Tests
+-----------------
+- Server crash recovery
+- Database failure recovery
+- Network interruption recovery
+- Invalid state recovery
+- Data corruption recovery
+- Session recovery
 
 Test Data Sets
 =============
 
-Test Users:
-1. Primary Test User
-   - Username: testuser1
-   - Password: password123
-   - Nickname: Test User One
+1. Users
+--------
+- Standard User:
+  * Username: testuser1
+  * Password: Password123!
+  * Nickname: Test User One
 
-2. Secondary Test User
-   - Username: testuser2
-   - Password: password456
-   - Nickname: Test User Two
+- Special Characters:
+  * Username: test@user#2
+  * Password: P@ssw0rd!
+  * Nickname: Test "User" Two
 
-Test Games:
-1. Basic Game
-   - Name: Test Game 1
-   - Creator: testuser1
+- Unicode:
+  * Username: テストユーザー
+  * Password: パスワード123
+  * Nickname: 测试用户
 
-2. Long Name Game
-   - Name: This is a very long game name to test display
-   - Creator: testuser2
+2. Games
+--------
+- Basic Game:
+  * Name: Test Game 1
+  * Max Players: 4
+  * Creator: testuser1
 
-3. Special Characters Game
-   - Name: @#$% Special Game !@#
-   - Creator: testuser1
+- Full Game:
+  * Name: Full Game
+  * Max Players: 2
+  * Creator: testuser1
+  * Players: [player1, player2]
+
+- Special Characters:
+  * Name: Test @#$% Game
+  * Max Players: 3
+  * Creator: test@user#2
+
+Test Environment Requirements
+===========================
+1. Clean database state before tests
+2. Isolated test environment
+3. Network condition simulation
+4. Multiple test clients
+5. Monitoring tools
+6. Logging system
+7. Performance metrics collection
+
+Success Criteria
+===============
+1. All test cases pass
+2. No critical bugs
+3. Performance within acceptable limits
+4. Security requirements met
+5. Accessibility guidelines followed
+6. Browser compatibility verified
+7. Recovery procedures validated
+
