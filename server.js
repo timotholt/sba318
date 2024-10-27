@@ -6,6 +6,7 @@ import { router as userRoutes } from './routes/users.js';
 import { router as lobbyRoutes } from './routes/lobby.js';
 import { db } from './database/database.js';
 import dotenv from 'dotenv';
+import { notFoundHandler, errorHandler } from './middleware/errorHandling.js';
 
 dotenv.config();
 
@@ -41,6 +42,10 @@ app.use('/lobby', lobbyRoutes);
 app.get('/about', (req, res) => {
     res.json({ message: 'Hello World!' });
 });
+
+// Error handling middleware
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

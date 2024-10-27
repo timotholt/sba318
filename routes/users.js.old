@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 const router = express.Router();
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /register - Parameters:`, { 
         username: req.body.username,
@@ -19,12 +19,20 @@ router.post('/register', async (req, res, next) => {
         const { username, password, nickname } = req.body;
 
         if (!username || !password) {
-            throw new APIError('Username and password are required', 400);
+            console.log(`[${timestamp}] Registration failed: Missing credentials`);
+            return res.status(400).json({
+                success: false,
+                message: 'Username and password are required'
+            });
         }
 
         const existingUser = await UserDB.findOne({ username });
         if (existingUser) {
-            throw new APIError('Username already exists', 400);
+            console.log(`[${timestamp}] Registration failed: Username ${username} already exists`);
+            return res.status(400).json({
+                success: false,
+                message: 'Username already exists'
+            });
         }
 
         await UserDB.create({ 
@@ -39,11 +47,15 @@ router.post('/register', async (req, res, next) => {
             message: 'Registration successful'
         });
     } catch (error) {
-        next(error);
+        console.error(`[${timestamp}] Registration error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Registration failed'
+        });
     }
 });
 
-router.post('/login', validateUsername, async (req, res, next) => {
+router.post('/login', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /login - Parameters:`, {
         username: req.body.username,
@@ -55,7 +67,11 @@ router.post('/login', validateUsername, async (req, res, next) => {
 
         const user = await UserDB.findOne({ username });
         if (!user || user.password !== password) {
-            throw new APIError('Invalid username or password', 401);
+            console.log(`[${timestamp}] Login failed: Invalid credentials for user ${username}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid username or password'
+            });
         }
 
         // // NEW CODE: Clean up any existing game memberships
@@ -72,14 +88,18 @@ router.post('/login', validateUsername, async (req, res, next) => {
         //         });
         //     }
         // }
-      
+
         console.log(`[${timestamp}] Login successful for user: ${username}`);
         res.json({ 
             success: true,
             nickname: user.nickname 
         });
     } catch (error) {
-        next(error);
+        console.error(`[${timestamp}] Login error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Login failed'
+        });
     }
 });
 
@@ -87,7 +107,7 @@ router.get('/admin-url', (req, res) => {
     res.json({ url: process.env.MONGO_ADMIN_URL });
 });
 
-router.post('/logout', validateUsername, async (req, res, next) => {
+router.post('/logout', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /logout - Parameters:`, {
         username: req.body.username
@@ -107,28 +127,39 @@ router.post('/logout', validateUsername, async (req, res, next) => {
         console.log(`[${timestamp}] Logout successful for user: ${username}`);
         res.json({ success: true });
     } catch (error) {
-        next(error);
+        console.error(`[${timestamp}] Logout error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Logout failed'
+        });
     }
 });
 
-router.patch('/change-nickname', validateUsername, async (req, res, next) => {
+router.patch('/change-nickname', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] PATCH /change-nickname - Username: ${req.body.username}`);
 
     try {
         const { username, nickname } = req.body;
         if (!nickname || nickname.trim().length === 0) {
-            throw new APIError('Nickname cannot be empty', 400);
+            return res.status(400).json({
+                success: false,
+                message: 'Nickname cannot be empty'
+            });
         }
 
         await UserDB.update({ username }, { nickname: nickname.trim() });
         res.json({ success: true });
     } catch (error) {
-        next(error);
+        console.error(`[${timestamp}] Change nickname error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to change nickname'
+        });
     }
 });
 
-router.patch('/change-password', validateUsername, async (req, res, next) => {
+router.patch('/change-password', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] PATCH /change-password - Username: ${req.body.username}`);
 
@@ -137,17 +168,24 @@ router.patch('/change-password', validateUsername, async (req, res, next) => {
         const user = await UserDB.findOne({ username });
 
         if (!user || user.password !== currentPassword) {
-            throw new APIError('Current password is incorrect', 401);
+            return res.status(401).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
         }
 
         await UserDB.update({ username }, { password: newPassword });
         res.json({ success: true });
     } catch (error) {
-        next(error);
+        console.error(`[${timestamp}] Change password error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to change password'
+        });
     }
 });
 
-router.delete('/:username', validateUsername, async (req, res, next) => {
+router.delete('/:username', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
     const username = req.params.username;
     console.log(`[${timestamp}] DELETE /${username}`);
@@ -156,7 +194,10 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
         const result = await UserDB.delete({ username });
 
         if (result.deletedCount === 0) {
-            throw new APIError('User not found', 404);
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
         }
 
         // Clean up any existing game memberships
@@ -175,9 +216,12 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
 
         res.json({ success: true });
     } catch (error) {
-        next(error);
+        console.error(`[${timestamp}] Delete account error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete account'
+        });
     }
 });
-
 
 export { router };
