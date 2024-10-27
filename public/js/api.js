@@ -46,6 +46,10 @@ export const api = {
         return this.sendRequest(`/lobby/${gameId}/join`, 'POST', { username });
     },
 
+    async leaveGame(gameId, username) {
+    return this.sendRequest(`/lobby/${gameId}/leave`, 'POST', { username });
+    },
+
     async getMongoAdminUrl() {
         return this.sendRequest('/user/admin-url', 'GET');
     },

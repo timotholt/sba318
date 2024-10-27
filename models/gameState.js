@@ -21,7 +21,17 @@ const gameStateSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  maxPlayers: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 4,
+    default: 4
+  },
   players: [{
+    type: String
+  }],
+  playerNicknames: [{
     type: String
   }],
   created: {

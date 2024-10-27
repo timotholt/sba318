@@ -87,8 +87,16 @@ class GameApp {
         document.getElementById('changePasswordButton').addEventListener('click', () => this.handleChangePassword());
         document.getElementById('deleteAccountButton').addEventListener('click', () => this.handleDeleteAccount());
 
-        document.getElementById('backToLobbyButton').addEventListener('click', () => {
-            showScreen(this.screens, 'lobby');
+        document.getElementById('backToLobbyButton').addEventListener('click', async () => {
+            try {
+                // We need to store the current game ID when joining a game
+                await api.leaveGame(this.currentGameId, window.globalUsername);
+                showScreen(this.screens, 'lobby');
+                this.updateGamesList(); // Refresh the games list
+            } catch (error) {
+                showError('Failed to leave game', 'game');
+              showError('Failed to leave game', 'lobby');
+            }
         });
     }
 
@@ -263,6 +271,7 @@ class GameApp {
         try {
             const response = await api.joinGame(gameId, window.globalUsername);
             if (response?.success) {
+                this.currentGameId = gameId; // Add this line to store the game ID
                 showScreen(this.screens, 'game');
             }
         } catch (error) {

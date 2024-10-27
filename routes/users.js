@@ -74,6 +74,21 @@ router.post('/login', validateUsername, async (req, res) => {
             });
         }
 
+        // // NEW CODE: Clean up any existing game memberships
+        // const games = await GameStateDB.findAll();
+        // for (const game of games) {
+        //     const playerIndex = game.players.indexOf(username);
+        //     if (playerIndex !== -1) {
+        //         // Remove player and their nickname
+        //         game.players.splice(playerIndex, 1);
+        //         game.playerNicknames.splice(playerIndex, 1);
+        //         await GameStateDB.update({ id: game.id }, { 
+        //             players: game.players,
+        //             playerNicknames: game.playerNicknames 
+        //         });
+        //     }
+        // }
+
         console.log(`[${timestamp}] Login successful for user: ${username}`);
         res.json({ 
             success: true,

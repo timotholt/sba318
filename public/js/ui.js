@@ -57,15 +57,27 @@ export function renderGamesList(games, onDelete, onJoin) {
         gameElement.className = 'game-item';
         
         const gameInfo = document.createElement('div');
-        gameInfo.textContent = `${game.name} (Created by: ${game.creatorNickname})`;
+        gameInfo.className = 'game-info';
+        gameInfo.innerHTML = `
+            <div class="game-header">
+                <h3>${game.name}</h3>
+                <span class="creator">Created by: ${game.creatorNickname}</span>
+            </div>
+            <div class="players-list">
+                Players (${game.players.length}/${game.maxPlayers}): ${game.playerNicknames.join(', ')}
+            </div>
+        `;
         
         const buttonsDiv = document.createElement('div');
         buttonsDiv.className = 'game-buttons';
 
-        const joinButton = document.createElement('button');
-        joinButton.textContent = 'Join Game';
-        joinButton.className = 'join-btn';
-        joinButton.onclick = () => onJoin(game.id);
+        if (game.players.length < game.maxPlayers) {
+            const joinButton = document.createElement('button');
+            joinButton.textContent = 'Join Game';
+            joinButton.className = 'join-btn';
+            joinButton.onclick = () => onJoin(game.id);
+            buttonsDiv.appendChild(joinButton);
+        }
         
         if (game.creator === window.globalUsername) {
             const deleteButton = document.createElement('button');
@@ -75,7 +87,6 @@ export function renderGamesList(games, onDelete, onJoin) {
             buttonsDiv.appendChild(deleteButton);
         }
         
-        buttonsDiv.appendChild(joinButton);
         gameElement.appendChild(gameInfo);
         gameElement.appendChild(buttonsDiv);
         gamesListDiv.appendChild(gameElement);
