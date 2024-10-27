@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { showScreen, showError, renderGamesList } from './ui.js';
+import { showScreen, showError, renderGamesList, clearAllErrors } from './ui.js';
 
 window.globalUsername = '';
 
@@ -88,9 +88,12 @@ class GameApp {
                 document.getElementById('registerUsername').value = '';
                 document.getElementById('registerPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
+            } else if (response?.message) {
+                showError(response.message, 'register');
             }
         } catch (error) {
-            showError('Registration failed. Please try again.', 'register');
+            const errorMessage = error.response?.message || 'Registration failed. Please try again.';
+            showError(errorMessage, 'register');
         }
     }
     
@@ -142,6 +145,9 @@ class GameApp {
         try {
             const response = await api.createGame(gameName, window.globalUsername);
             if (response?.success) {
+                // Clear any errors on this page
+                clearAllErrors();
+              
                 gameNameInput.value = '';
                 this.updateGamesList();
             }
@@ -154,6 +160,9 @@ class GameApp {
         try {
             const response = await api.deleteGame(gameId, window.globalUsername);
             if (response?.success) {
+                // Clear any errors on this page
+                clearAllErrors();
+
                 this.updateGamesList();
             }
         } catch (error) {

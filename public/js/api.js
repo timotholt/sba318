@@ -41,16 +41,19 @@ export const api = {
             }
 
             const response = await fetch(url, options);
+            const result = await response.json();
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw { response: result };
             }
             
-            const result = await response.json();
             return result;
         } catch (error) {
+            if (error.response) {
+                throw error;
+            }
             console.error('API Error:', error);
-            throw error;
+            throw { response: { message: 'An unexpected error occurred' } };
         }
     }
 };

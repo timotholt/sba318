@@ -42,6 +42,22 @@ router.post('/', (req, res) => {
             });
         }
 
+        // Check if a game with the same name already exists
+        const existingGame = games.find(game => game.name.toLowerCase() === name.toLowerCase());
+
+
+    console.log(`existingGame = ${existingGame}`);
+      console.log(games);
+      console.log(`newgame name = ${name.toLowerCase()}`);
+      
+        if (existingGame) {
+            console.log(`[${timestamp}] Game creation failed: Game name "${name}" already exists`);
+            return res.status(400).json({
+                success: false,
+                message: 'A game with this name already exists'
+            });
+        }
+
         const newGame = {
             id: Date.now().toString(),
             name,

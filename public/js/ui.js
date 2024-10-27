@@ -3,22 +3,28 @@ export function showScreen(screens, screenName) {
         screen.classList.add('hidden');
     });
     screens[screenName].classList.remove('hidden');
+    clearAllErrors();
+}
+
+// Get all error containers
+const errorContainers = {
+    login: document.getElementById('loginError'),
+    register: document.getElementById('registerError'),
+    lobby: document.getElementById('lobbyError'),
+    game: document.getElementById(`gameError`)
+};
+
+export function clearAllErrors() {
+    Object.keys(errorContainers).forEach(key => {
+        showError('', key);
+    });
 }
 
 export function showError(message, screenName = 'login') {
-    // Get all error containers
-    const errorContainers = {
-        login: document.getElementById('loginError'),
-        register: document.getElementById('registerError'),
-        lobby: document.getElementById('lobbyError'),
-        game: document.getElementById(`gameError`)
-    };
-
-    // Show error in the appropriate container
     const errorDiv = errorContainers[screenName];
     if (errorDiv) {
         errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
+        errorDiv.style.display = message ? 'block' : 'none';
         
         // Hide the error after 3 seconds
         setTimeout(() => {
