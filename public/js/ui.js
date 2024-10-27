@@ -91,8 +91,7 @@ export function renderGamesList(games, onDelete, onJoin) {
                 <span class="creator">Created by: ${creatorNickname}</span>
             </div>
             <div class="players-list">
-                Players (${game.players.length}/${game.maxPlayers}): 
-                ${game.players.map(player => player.nickname || 'Unknown Player').join(', ')}
+                Players (${game.players.length}/${game.maxPlayers})
             </div>
         `;
 

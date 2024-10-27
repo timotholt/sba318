@@ -48,6 +48,21 @@ class ChatService {
     }
 
     async createMessage(type, userId, message, gameId = null) {
+
+        // System user bypasses all validation
+        if (userId === '00000000-0000-0000-0000-000000000000') {
+            return await ChatDB.create({
+                type,
+                gameId: type === 'game' ? gameId : undefined,
+                userId,
+                username: 'system',
+                nickname: 'System',
+                message: message.trim(),
+                timestamp: new Date()
+            });
+        }
+
+        // Otherwise it's a user message, do the normal validation checks
         if (!type || !['lobby', 'game'].includes(type)) {
             throw new APIError('Valid chat type (lobby/game) is required', 400);
         }

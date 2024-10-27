@@ -488,11 +488,24 @@ class GameApp {
 
     // We only update the lobby chat or the game chat, but not both.
     async updateChat() {
-        if (this.currentGameId) {
-            await this.updateGameChat();
-        } else {
-            await this.updateLobbyChat();
+      
+        // Always update lobby chat when in lobby screen
+        if (this.screens.lobby.classList.contains('hidden') === false) {
+          await this.updateLobbyChat();
         }
+    
+        // Update game chat if in game screen
+        if (this.currentGameId) {
+          await this.updateGameChat();
+        }
+      
+        // OLD SYSTEM CHECKS currentGameId but it shoudld just check to se what scren we are on
+        // if (this.currentGameId) {
+        //     await this.updateGameChat();
+        // } else {
+        //     await this.updateLobbyChat();
+        // }
+
     }
   
     // Super clean and super elegant.

@@ -1,20 +1,22 @@
+//This code changed so many times I kept all the old versions at the bottom
+
 import express from 'express';
 import { GameStateDB } from '../models/GameState.js';
 import { UserDB } from '../models/User.js';
 import { ChatDB } from '../models/Chat.js';
 import { APIError } from '../middleware/errorHandling.js';
-import { SystemMessages } from '../models/SystemMessages.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const router = express.Router();
 
 router.get('/', async (req, res, next) => {
-    const userId = req.query.userId;
+    const userId = req.query.userId; // Changed from username to userId
     
     try {
         const games = await GameStateDB.findAll();
         
+        // Filter games if userId is provided
         const filteredGames = userId 
             ? games.filter(game => 
                 game.creator === userId || 
@@ -22,24 +24,19 @@ router.get('/', async (req, res, next) => {
               )
             : games;
 
-const gamesWithCreatorInfo = await Promise.all(filteredGames.map(async game => {
-    const creator = await UserDB.findById(game.creator);
-    
-    // // Also fetch player nicknames
-    // const players = await Promise.all(game.players.map(async playerId => {
-    //     const player = await UserDB.findById(playerId);
-    //     return {
-    //         userId: playerId,
-    //         nickname: player ? player.nickname : 'Unknown Player'
-    //     };
-    // }));
-    
-    return {
-        ...game,
-        creatorNickname: creator ? creator.nickname : 'Unknown User',
-    };
-}));
+        // Populate creator nicknames
+        const gamesWithCreatorInfo = await Promise.all(filteredGames.map(async game => {
+            const creator = await UserDB.findById(game.creator);
+
+console.log(`lobby.js line 29, creator = ${creator}, creator.nickname = ${creator.nickname}`);
+          
+            return {
+                ...game,
+                creatorNickname: creator ? creator.nickname : 'Unknown User'
+            };
+        }));
         
+        // No need to fetch nicknames separately as they're stored with players
         console.log(`Total games: ${gamesWithCreatorInfo.length}`);
         res.json(gamesWithCreatorInfo);
     } catch (error) {
@@ -77,9 +74,6 @@ router.post('/', async (req, res, next) => {
             players: []
         });
 
-        // Send system message about game creation
-        await SystemMessages.gameCreated(name, creatorUser.nickname);
-
         res.json({ success: true, game: newGame });
     } catch (error) {
         next(error);
@@ -101,21 +95,16 @@ router.post('/:id/join', async (req, res, next) => {
             throw new APIError('User not found', 404);
         }
 
-        // First join the game
-        const updatedGame = await GameStateDB.addPlayer(id, userId);
+        const updatedGame = await GameStateDB.addPlayer(id, userId, joiningUser.nickname);
         if (!updatedGame) {
             throw new APIError('Failed to join game', 500);
         }
-
-        // Then send the system message after successful join
-        await SystemMessages.userJoined(id, joiningUser.nickname);
 
         res.json({ success: true, game: updatedGame });
     } catch (error) {
         next(error);
     }
 });
-
 
 router.post('/:id/leave', async (req, res, next) => {
     const { userId } = req.body;
@@ -127,17 +116,9 @@ router.post('/:id/leave', async (req, res, next) => {
             throw new APIError('Game not found', 404);
         }
 
-        const leavingUser = await UserDB.findById(userId);
-        if (!leavingUser) {
-            throw new APIError('User not found', 404);
-        }
-
         if (!await GameStateDB.isPlayerInGame(id, userId)) {
             throw new APIError('User not in game', 400);
         }
-
-        // Send system message before removing player
-        await SystemMessages.userLeft(id, leavingUser.nickname);
 
         const updatedGame = await GameStateDB.removePlayer(id, userId);
         if (!updatedGame) {
@@ -168,14 +149,6 @@ router.delete('/:id', async (req, res, next) => {
         if (game.creator !== userId) {
             throw new APIError('Only the creator can delete the game', 403);
         }
-
-        const creator = await UserDB.findById(userId);
-        if (!creator) {
-            throw new APIError('Creator not found', 404);
-        }
-
-        // Send system message before deleting
-        await SystemMessages.gameDeleted(game.name, creator.nickname);
 
         await GameStateDB.delete({ id });
         await ChatDB.deleteByGame(id);

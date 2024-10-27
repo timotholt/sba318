@@ -5,7 +5,6 @@ import { UserDB } from '../models/User.js';
 import { GameStateDB } from '../models/GameState.js';
 import { ChatDB } from '../models/Chat.js';
 import { APIError } from '../middleware/errorHandling.js';
-import { SystemMessages } from '../models/SystemMessages.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -55,7 +54,7 @@ router.post('/login', validateUsername, async (req, res, next) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /login - Parameters:`, {
         username: req.body.username,
-        password: req.body.password,
+      password: req.body.password,
         passwordLength: req.body.password?.length || 0
     });
 
@@ -67,9 +66,6 @@ router.post('/login', validateUsername, async (req, res, next) => {
         if (!user || user.password !== password) {
             throw new APIError('Invalid username or password', 401);
         }
-
-        // Send system message about user login
-        await SystemMessages.userLoggedIn(user.nickname);
 
         console.log(`[${timestamp}] Login successful for user: ${username}`);
         res.json({ 
@@ -94,17 +90,8 @@ router.post('/logout', validateUserId, async (req, res, next) => {
 
     try {
         const { userId } = req.body;
-        
-        // Get user before removing from games
-        const user = await UserDB.findById(userId);
-        if (!user) {
-            throw new APIError('User not found', 404);
-        }
-
-        // Send system message about user logout
-        await SystemMessages.userLoggedOut(user.nickname);
-
         const games = await GameStateDB.findAll();
+        
         for (const game of games) {
             if (await GameStateDB.isPlayerInGame(game.id, userId)) {
                 await GameStateDB.removePlayer(game.id, userId);
@@ -121,12 +108,6 @@ router.patch('/change-nickname', validateNickname, async (req, res, next) => {
     try {
         const { userId, nickname } = req.body;
       
-        // Get user before updating nickname
-        const user = await UserDB.findById(userId);
-        if (!user) {
-            throw new APIError('User not found', 404);
-        }
-
         // Trim the nickname
         const trimmedNickname = validation.trim.nickname(nickname);
         
@@ -142,9 +123,6 @@ router.patch('/change-nickname', validateNickname, async (req, res, next) => {
             { userId }, // Find all messages by this user
             { nickname: trimmedNickname } // Update their nickname
         );
-
-        // Send system message about nickname change
-        await SystemMessages.nicknameChanged(user.nickname, trimmedNickname);
 
         res.json({ success: true });
     } catch (error) {
@@ -205,9 +183,6 @@ router.delete('/:userId', validateUserId, async (req, res, next) => {
             );
         }
 
-        // Send system message before deleting
-        await SystemMessages.userDeleted(user.nickname);
-
         // Soft delete the user
         await UserDB.softDelete(userId);
 
@@ -228,3 +203,4 @@ router.delete('/:userId', validateUserId, async (req, res, next) => {
 });
 
 export { router };
+
