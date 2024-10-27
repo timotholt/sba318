@@ -185,12 +185,12 @@ router.patch('/change-password', validateUsername, async (req, res) => {
     }
 });
 
-router.post('/delete-account', validateUsername, async (req, res) => {
+router.delete('/:username', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] POST /delete-account - Username: ${req.body.username}`);
+    const username = req.params.username;
+    console.log(`[${timestamp}] DELETE /${username}`);
 
     try {
-        const { username } = req.body;
         const result = await UserDB.delete({ username });
 
         if (result.deletedCount === 0) {
@@ -205,7 +205,6 @@ router.post('/delete-account', validateUsername, async (req, res) => {
         for (const game of games) {
             const playerIndex = game.players.indexOf(username);
             if (playerIndex !== -1) {
-                // Remove player and their nickname
                 game.players.splice(playerIndex, 1);
                 game.playerNicknames.splice(playerIndex, 1);
                 await GameStateDB.update({ id: game.id }, { 

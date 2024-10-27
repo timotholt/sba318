@@ -27,7 +27,7 @@ export const api = {
     },
 
     async deleteAccount(username) {
-        return this.sendRequest('/user/delete-account', 'POST', { username });
+        return this.sendRequest(`/user/${username}`, 'DELETE');
     },
 
     async getGames() {
