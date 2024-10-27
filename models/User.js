@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { getDbEngine } from '../database/selectDbEngine.js';
+import { db } from '../database/database.js';
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -44,22 +44,20 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 export const User = mongoose.model('User', userSchema);
 
-const db = getDbEngine(process.env.DB_TYPE || 'memory');
-
 export const UserDB = {
   async findOne(query) {
-    return await db.findOne(User, query);
+    return await db.getEngine().findOne(User, query);
   },
 
   async create(userData) {
-    return await db.create(User, userData);
+    return await db.getEngine().create(User, userData);
   },
 
   async update(query, data) {
-    return await db.update(User, query, data);
+    return await db.getEngine().update(User, query, data);
   },
 
   async delete(query) {
-    return await db.delete(User, query);
+    return await db.getEngine().delete(User, query);
   }
 };

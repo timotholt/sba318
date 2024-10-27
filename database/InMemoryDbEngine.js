@@ -6,6 +6,13 @@ export class InMemoryDbEngine extends BaseDbEngine {
     this.storage = new Map();
   }
 
+  async find(collection, query) {
+    const collectionData = this.storage.get(collection.modelName) || [];
+    return collectionData.filter(item => 
+      Object.entries(query).every(([key, value]) => item[key] === value)
+    );
+  }
+
   async findOne(collection, query) {
     const collectionData = this.storage.get(collection.modelName) || [];
     return collectionData.find(item => 
@@ -46,4 +53,3 @@ export class InMemoryDbEngine extends BaseDbEngine {
     return { deletedCount: initialLength - filtered.length };
   }
 }
-

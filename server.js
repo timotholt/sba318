@@ -4,7 +4,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { router as userRoutes } from './routes/users.js';
 import { router as lobbyRoutes } from './routes/lobby.js';
-import { connectDB } from './database/database.js';
+import { db } from './database/database.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,9 +19,6 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next();
 });
-
-// Connect to MongoDB
-connectDB();
 
 // Add Morgan middleware for logging
 app.use(morgan('dev'));
@@ -54,6 +51,15 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Start the database, exit if we can't start it
+try {
+    await db.connect();
+} catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+}
+
+// Start listening for reqeusts!
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

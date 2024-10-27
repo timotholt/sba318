@@ -1,6 +1,10 @@
 import { BaseDbEngine } from './BaseDbEngine.js';
 
 export class MongoDbEngine extends BaseDbEngine {
+  async find(collection, query) {
+    return await collection.find(query);
+  }
+
   async findOne(collection, query) {
     return await collection.findOne(query);
   }

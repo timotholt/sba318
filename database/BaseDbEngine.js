@@ -1,4 +1,8 @@
 export class BaseDbEngine {
+  async find(collection, query) {
+    throw new Error('Method not implemented');
+  }
+
   async findOne(collection, query) {
     throw new Error('Method not implemented');
   }

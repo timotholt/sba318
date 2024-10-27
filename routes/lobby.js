@@ -1,5 +1,5 @@
 import express from 'express';
-import { games } from '../models/gameState.js';
+import { GameStateDB } from '../models/GameState.js';
 import { UserDB } from '../models/User.js';
 
 const router = express.Router();
@@ -10,17 +10,9 @@ router.get('/', async (req, res) => {
     console.log(`[${timestamp}] GET / - Fetching all games`);
 
     try {
-        // Fetch all games and add creator nicknames
-        const gamesWithNicknames = await Promise.all(games.map(async game => {
-            const creator = await UserDB.findOne({ username: game.creator });
-            return {
-                ...game,
-                creatorNickname: creator?.nickname || game.creator
-            };
-        }));
-
+        const games = await GameStateDB.findAll();
         console.log(`[${timestamp}] Total games: ${games.length}`);
-        res.json(gamesWithNicknames);
+        res.json(games);
     } catch (error) {
         console.error(`[${timestamp}] Error fetching games:`, error);
         res.status(500).json({
@@ -49,7 +41,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        const existingGame = games.find(game => game.name.toLowerCase() === name.toLowerCase());
+        const existingGame = await GameStateDB.findOne({ name: name });
         
         if (existingGame) {
             console.log(`[${timestamp}] Game creation failed: Game name "${name}" already exists`);
@@ -59,17 +51,23 @@ router.post('/', async (req, res) => {
             });
         }
 
+        // Get the creator's nickname
         const creatorUser = await UserDB.findOne({ username: creator });
-        const newGame = {
-            id: Date.now().toString(),
+        if (!creatorUser) {
+            console.log(`[${timestamp}] Game creation failed: Creator ${creator} not found`);
+            return res.status(400).json({
+                success: false,
+                message: 'Creator not found'
+            });
+        }
+
+        const newGame = await GameStateDB.create({
             name,
             creator,
-            creatorNickname: creatorUser?.nickname || creator,
-            players: [creator],
-            created: new Date().toISOString()
-        };
+            creatorNickname: creatorUser.nickname || creator,
+            players: [creator]
+        });
 
-        games.push(newGame);
         console.log(`[${timestamp}] New game created:`, newGame);
         res.json({ success: true, game: newGame });
     } catch (error) {
@@ -82,7 +80,7 @@ router.post('/', async (req, res) => {
 });
 
 // Delete a game
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const timestamp = new Date().toISOString();
     const username = req.query.username;
     const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
@@ -103,10 +101,9 @@ router.delete('/:id', (req, res) => {
         }
 
         const { id } = req.params;
+        const game = await GameStateDB.findOne({ id });
         
-        const gameIndex = games.findIndex(g => g.id === id);
-        
-        if (gameIndex === -1) {
+        if (!game) {
             console.log(`[${timestamp}] Game deletion failed: Game ${id} not found`);
             return res.status(404).json({
                 success: false,
@@ -114,7 +111,7 @@ router.delete('/:id', (req, res) => {
             });
         }
 
-        if (games[gameIndex].creator !== username) {
+        if (game.creator !== username) {
             console.log(`[${timestamp}] Game deletion failed: User ${username} is not the creator of game ${id}`);
             return res.status(403).json({
                 success: false,
@@ -122,9 +119,8 @@ router.delete('/:id', (req, res) => {
             });
         }
 
-        const deletedGame = games[gameIndex];
-        games.splice(gameIndex, 1);
-        console.log(`[${timestamp}] Game deleted successfully:`, deletedGame);
+        await GameStateDB.delete({ id });
+        console.log(`[${timestamp}] Game deleted successfully:`, game);
         res.json({ success: true });
     } catch (error) {
         console.error(`[${timestamp}] Error deleting game:`, error);
@@ -136,7 +132,7 @@ router.delete('/:id', (req, res) => {
 });
 
 // Join a game
-router.post('/:id/join', (req, res) => {
+router.post('/:id/join', async (req, res) => {
     const timestamp = new Date().toISOString();
     const { username } = req.body;
     const { id } = req.params;
@@ -147,7 +143,7 @@ router.post('/:id/join', (req, res) => {
     });
 
     try {
-        const game = games.find(g => g.id === id);
+        const game = await GameStateDB.findOne({ id });
         
         if (!game) {
             console.log(`[${timestamp}] Join game failed: Game ${id} not found`);
@@ -163,6 +159,8 @@ router.post('/:id/join', (req, res) => {
         }
 
         game.players.push(username);
+        await GameStateDB.update({ id }, { players: game.players });
+        
         console.log(`[${timestamp}] User ${username} joined game ${id} successfully`);
         res.json({ success: true, game });
     } catch (error) {
