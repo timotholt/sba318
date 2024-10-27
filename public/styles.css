@@ -122,3 +122,18 @@ button:hover {
     text-align: right;
     margin-top: 5px;
 }
+
+.admin-link {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.admin-link a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.8em;
+}
+
+.admin-link a:hover {
+    text-decoration: underline;
+}

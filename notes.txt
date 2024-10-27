@@ -1,0 +1,80 @@
+MONGODB ATLAS SETUP
+----------------
+1. Create MongoDB Atlas Account:
+   - Visit: https://www.mongodb.com/cloud/atlas
+   - Sign up for free account
+   - Create new project
+
+MongoDB hack40k/AWwyFkk7iibN9fz7
+AWwyFkk7iibN9fz7
+AWwyFkk7iibN9fz7
+AWwyFkk7iibN9fz7
+AWwyFkk7iibN9fz7
+
+2. Database Setup:
+   - Create new cluster (free tier works)
+   - Create database user (Database Access)
+   - Set network access (Network Access tab)
+   - Get connection string (Connect button)
+
+3. Environment Setup:
+   - Copy .env.example to .env
+   - Update MONGODB_URI with your connection string
+   - Format: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
+
+SECURITY FEATURES
+----------------
+- Password hashing with bcrypt
+- Rate limiting (100 requests per 15 minutes)
+- MongoDB query sanitization
+- Request size limiting (10kb)
+- Mongoose schema validation
+- Auto-reconnect on MongoDB disconnection
+
+API ENDPOINTS
+------------
+POST /player/register
+- Register new user
+- Required: username, password
+
+POST /player/login
+- Login existing user
+- Required: username, password
+
+POST /player/logout
+- Logout user
+- Required: username
+
+GET /lobby
+- Get all games
+
+POST /lobby
+- Create new game
+- Required: name, creator
+
+DELETE /lobby/:id
+- Delete game
+- Required: gameId, username (query param)
+
+POST /lobby/:id/join
+- Join existing game
+- Required: gameId, username
+
+============================
+
+const mongoose = require('mongoose');
+const uri = "mongodb+srv://<db_username>:<db_password>@cluster0.mf4c7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+async function run() {
+  try {
+    // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
+    await mongoose.connect(uri, clientOptions);
+    await mongoose.connection.db.admin().command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await mongoose.disconnect();
+  }
+}
+run().catch(console.dir);
+

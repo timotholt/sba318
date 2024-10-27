@@ -59,6 +59,19 @@ class GameApp {
             });
         });
 
+        // MongoDB Admin
+        document.getElementById('adminLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await api.getMongoAdminUrl();
+                if (response.url) {
+                    window.open(response.url, '_blank');
+                }
+            } catch (error) {
+                showError('Could not open admin interface', 'login');
+            }
+        });
+
         // Logout
         document.getElementById('logoutButton').addEventListener('click', () => this.handleLogout());
 

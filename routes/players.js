@@ -1,14 +1,13 @@
 import express from 'express';
 import { validateUsername } from '../middleware/validation.js';
+import { UserDB } from '../models/User.js';
 import { games } from '../models/gameState.js';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const router = express.Router();
 
-// In-memory storage for users (in a real app, use a database)
-const users = new Map();
-
-// Register
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /register - Parameters:`, { 
         username: req.body.username,
@@ -26,7 +25,8 @@ router.post('/register', (req, res) => {
             });
         }
 
-        if (users.has(username)) {
+        const existingUser = await UserDB.findOne({ username });
+        if (existingUser) {
             console.log(`[${timestamp}] Registration failed: Username ${username} already exists`);
             return res.status(400).json({
                 success: false,
@@ -34,8 +34,7 @@ router.post('/register', (req, res) => {
             });
         }
 
-        // In a real app, hash the password before storing
-        users.set(username, { password });
+        await UserDB.create({ username, password });
         console.log(`[${timestamp}] Registration successful for user: ${username}`);
 
         res.json({
@@ -51,21 +50,17 @@ router.post('/register', (req, res) => {
     }
 });
 
-// Login
-router.post('/login', validateUsername, (req, res) => {
+router.post('/login', validateUsername, async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /login - Parameters:`, {
         username: req.body.username,
-        password: req.body.password,
         passwordLength: req.body.password?.length || 0
     });
-
-    console.log(`password = ${req.body.password}`);
 
     try {
         const { username, password } = req.body;
 
-        const user = users.get(username);
+        const user = await UserDB.findOne({ username });
         if (!user || user.password !== password) {
             console.log(`[${timestamp}] Login failed: Invalid credentials for user ${username}`);
             return res.status(401).json({
@@ -85,7 +80,10 @@ router.post('/login', validateUsername, (req, res) => {
     }
 });
 
-// Logout
+router.get('/admin-url', (req, res) => {
+    res.json({ url: process.env.MONGO_ADMIN_URL });
+});
+
 router.post('/logout', validateUsername, (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /logout - Parameters:`, {
@@ -94,7 +92,6 @@ router.post('/logout', validateUsername, (req, res) => {
 
     try {
         const { username } = req.body;
-        // Only remove the player from active games, don't delete the games
         games.forEach(game => {
             if (game.players.includes(username)) {
                 game.players = game.players.filter(p => p !== username);

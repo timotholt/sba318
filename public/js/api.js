@@ -27,6 +27,10 @@ export const api = {
         return this.sendRequest(`/lobby/${gameId}/join`, 'POST', { username });
     },
 
+    async getMongoAdminUrl() {
+        return this.sendRequest('/player/admin-url', 'GET');
+    },
+
     async sendRequest(url, method = 'GET', data = null) {
         try {
             const options = {
