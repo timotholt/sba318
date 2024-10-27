@@ -152,15 +152,23 @@ class GameApp {
     
     async deleteGame(gameId) {
         try {
-
-            window.alert(`DeleteGame() username = ${window.globalUsername}`)
-          
             const response = await api.deleteGame(gameId, window.globalUsername);
             if (response?.success) {
                 this.updateGamesList();
             }
         } catch (error) {
             showError('Failed to delete game. Please try again.', 'lobby');
+        }
+    }
+
+    async joinGame(gameId) {
+        try {
+            const response = await api.joinGame(gameId, window.globalUsername);
+            if (response?.success) {
+                showScreen(this.screens, 'game');
+            }
+        } catch (error) {
+            showError('Failed to join game. Please try again.', 'lobby');
         }
     }
     
@@ -202,10 +210,11 @@ class GameApp {
     async updateGamesList() {
         try {
             const games = await api.getGames();
-
-            // window.alert(`updateGamesList() username = ${username}`);
-          
-            renderGamesList(games, (gameId) => this.deleteGame(gameId));
+            renderGamesList(
+                games,
+                (gameId) => this.deleteGame(gameId),
+                (gameId) => this.joinGame(gameId)
+            );
         } catch (error) {
             console.error('Failed to update games list:', error);
         }

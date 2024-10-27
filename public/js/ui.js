@@ -27,7 +27,7 @@ export function showError(message, screenName = 'login') {
     }
 }
 
-export function renderGamesList(games, onDelete) {
+export function renderGamesList(games, onDelete, onJoin) {
     const gamesListDiv = document.getElementById('gamesList');
     if (!gamesListDiv) return;
 
@@ -40,20 +40,25 @@ export function renderGamesList(games, onDelete) {
         const gameInfo = document.createElement('div');
         gameInfo.textContent = `${game.name} (Created by: ${game.creator})`;
         
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = `🗑️ Delete` + ` (${game.creator})`;
-        deleteButton.onclick = () => onDelete(game.id);
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'game-buttons';
 
-      // window.alert(`currentUsername = ${currentUsername}`);
+        const joinButton = document.createElement('button');
+        joinButton.textContent = 'Join Game';
+        joinButton.className = 'join-btn';
+        joinButton.onclick = () => onJoin(game.id);
         
-        // Only show delete button for games created by current user
         if (game.creator === window.globalUsername) {
-            gameElement.appendChild(gameInfo);
-            gameElement.appendChild(deleteButton);
-        } else {
-            gameElement.appendChild(gameInfo);
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '🗑️ Delete';
+            deleteButton.className = 'delete-btn';
+            deleteButton.onclick = () => onDelete(game.id);
+            buttonsDiv.appendChild(deleteButton);
         }
         
+        buttonsDiv.appendChild(joinButton);
+        gameElement.appendChild(gameInfo);
+        gameElement.appendChild(buttonsDiv);
         gamesListDiv.appendChild(gameElement);
     });
 }

@@ -1,7 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import { router as playerRoutes } from './routes/players.js';
-import { router as gameRoutes } from './routes/games.js';
+import { router as lobbyRoutes } from './routes/lobby.js';
 
 const app = express();
 const port = 3000;
@@ -18,7 +18,7 @@ app.use(express.static('public'));
 
 // API Routes
 app.use('/player', playerRoutes);
-app.use('/game', gameRoutes);
+app.use('/lobby', lobbyRoutes);
 
 // Root route handler
 app.get('/about', (req, res) => {

@@ -12,15 +12,19 @@ export const api = {
     },
 
     async getGames() {
-        return this.sendRequest('/game', 'GET');
+        return this.sendRequest('/lobby', 'GET');
     },
 
     async createGame(name, creator) {
-        return this.sendRequest('/game', 'POST', { name, creator });
+        return this.sendRequest('/lobby', 'POST', { name, creator });
     },
 
     async deleteGame(gameId, username) {
-        return this.sendRequest(`/game/${gameId}?username=${username}`, 'DELETE');
+        return this.sendRequest(`/lobby/${gameId}?username=${username}`, 'DELETE');
+    },
+
+    async joinGame(gameId, username) {
+        return this.sendRequest(`/lobby/${gameId}/join`, 'POST', { username });
     },
 
     async sendRequest(url, method = 'GET', data = null) {
