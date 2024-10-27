@@ -117,12 +117,12 @@
                 <button id="deleteAccountButton" class="delete-btn" data-userid="">Delete Account</button>
             </div>
         </div>
-
-        <!-- Game screen - update data attributes -->
         <div id="gameScreen" class="screen hidden">
-            <h2>Game</h2>
+            <div class="header">
+                <h2>Game: <span id="currentGameName"></span></h2>
+                <button id="backToLobbyButton" data-userid="">Leave Game</button>
+            </div>
             <div id="gameContent" data-userid=""></div>
-            <button id="backToLobbyButton" data-userid="">Leave Game</button>
             <div id="gameChatContainer" class="chat-container">
                 <div id="gameChatMessages" class="chat-messages" data-userid=""></div>
                 <div class="chat-input">

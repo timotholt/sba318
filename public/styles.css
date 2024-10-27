@@ -114,6 +114,30 @@ body::before {
   min-width: 800px;
 }
 
+#gameScreen .header {
+    margin-bottom: 15px; /* Smaller margin than lobby */
+}
+
+#gameScreen .header h2 {
+    font-size: 1.2em; /* Smaller than lobby header */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#gameScreen #backToLobbyButton {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    background: var(--danger);
+    opacity: 0.8;
+}
+
+#gameScreen #backToLobbyButton:hover {
+    background: var(--danger-hover);
+    opacity: 1;
+    box-shadow: var(--glow-danger);
+}
+
 .screen:hover {
     transform: translateY(-2px); */
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
@@ -458,8 +482,23 @@ button:hover {
     /* margin-bottom: 10px; */
     transition: var(--transition);
     /* border: 1px solid rgba(255, 255, 255, 0.03); */
+
+    /* Fade in when it appears -- causes bad flicker */
+    /* animation: fadeIn 0.3s ease-out;
+    opacity: 1; */
 }
 
+/* @keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+ */
 .chat-message:hover {
     transform: translateX(4px);
     box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.2);
@@ -468,6 +507,10 @@ button:hover {
 .chat-nickname {
     color: var(--accent);
     font-weight: 600;
+}
+
+.chat-nickname.system-user {
+    color: #FFD700; /* Gold/yellow color */
 }
 
 .chat-timestamp {

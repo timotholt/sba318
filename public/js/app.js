@@ -361,6 +361,9 @@ class GameApp {
             const response = await api.joinGame(gameId, window.globalUserId);
             if (response?.success) {
                 this.currentGameId = gameId;
+
+              // Set the game name in the header
+                document.getElementById('currentGameName').textContent = response.game.name;
                 showScreen(this.screens, 'game');
             }
         } catch (error) {
@@ -426,17 +429,40 @@ class GameApp {
       chatMessages.innerHTML = '';
     }
 
-    renderChatMessages(messages, containerId) {
-        const chatMessages = document.getElementById(containerId);
-        chatMessages.innerHTML = messages.map(msg => `
-            <div class="chat-message">
-                <span class="chat-nickname">${msg.nickname}:</span>
-                ${msg.message}
-                <span class="chat-timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
-            </div>
-        `).join('');
+// renderChatMessages(messages, containerId) {
+//     const chatMessages = document.getElementById(containerId);
+//     chatMessages.innerHTML = messages.map(msg => `
+//         <div class="chat-message">
+//             <span class="chat-nickname ${msg.userId === '00000000-0000-0000-0000-000000000000' ? 'system-user' : ''}">${msg.nickname}:</span>
+//             ${msg.message}
+//             <span class="chat-timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+//         </div>
+//     `).join('');
+//     chatMessages.scrollTop = chatMessages.scrollHeight;
+// }
+  renderChatMessages(messages, containerId) {
+    const chatMessages = document.getElementById(containerId);
+    
+    // Store current number of messages and scroll position
+    const currentMessageCount = chatMessages.children.length;
+    const wasScrolledToBottom = chatMessages.scrollHeight - chatMessages.scrollTop === chatMessages.clientHeight;
+
+    // Update messages
+    chatMessages.innerHTML = messages.map(msg => `
+        <div class="chat-message">
+            <span class="chat-nickname ${msg.userId === '00000000-0000-0000-0000-000000000000' ? 'system-user' : ''}">${msg.nickname}:</span>
+            ${msg.message}
+            <span class="chat-timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+        </div>
+    `).join('');
+
+    // Only scroll to bottom if:
+    // 1. We were already at the bottom OR
+    // 2. There are new messages
+    if (wasScrolledToBottom || messages.length > currentMessageCount) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+}
 
     // The polling code is cool.  It should be setTimeout() instead
     // of setInterval() but it works so don't fix what's not broken.
