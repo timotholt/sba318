@@ -2,6 +2,7 @@ import express from 'express';
 import { validateUsername } from '../middleware/validation.js';
 import { UserDB } from '../models/User.js';
 import { GameStateDB } from '../models/GameState.js';
+import { APIError } from '../middleware/errorHandling.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
