@@ -153,14 +153,31 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
     console.log(`[${timestamp}] DELETE /${username}`);
 
     try {
-        const result = await UserDB.delete({ username });
-
-        if (result.deletedCount === 0) {
+        // First check if user exists
+        const user = await UserDB.findOne({ username });
+        if (!user) {
             throw new APIError('User not found', 404);
         }
 
-        // Clean up any existing game memberships
+        // Find any games they created that have active players
         const games = await GameStateDB.findAll();
+        const activeGames = games.filter(game => 
+            game.creator === username && 
+            game.players.length > 0 &&
+            game.players.some(player => player !== username)
+        );
+
+        if (activeGames.length > 0) {
+            throw new APIError(
+                'Cannot delete account while you have active games with other players. Please delete your games first.',
+                400
+            );
+        }
+
+        // Delete all games they created (should be empty now)
+        await GameStateDB.delete({ creator: username });
+
+        // Remove them from any games they joined
         for (const game of games) {
             const playerIndex = game.players.indexOf(username);
             if (playerIndex !== -1) {
@@ -173,11 +190,18 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
             }
         }
 
+        // Finally delete the user
+        const result = await UserDB.delete({ username });
+        if (result.deletedCount === 0) {
+            throw new APIError('User not found', 404);
+        }
+
         res.json({ success: true });
     } catch (error) {
         next(error);
     }
 });
+
 
 
 export { router };

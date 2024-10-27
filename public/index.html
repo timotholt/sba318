@@ -45,12 +45,18 @@
                     <button id="logoutButton" class="logout-btn">Logout</button>
                 </div>
             </div>
-            <div class="form-group">
-                <input type="text" id="gameName" placeholder="Enter game name">
-                <button id="createGameButton">Create Game</button>
-                <div id="lobbyError" class="error">LOBBY ERRORS GO HERE</div>
-            </div>
-            <div id="gamesList"></div>
+<div class="form-group">
+    <input type="text" id="gameName" placeholder="Enter game name">
+    <button id="createGameButton">Create Game</button>
+    <div id="lobbyError" class="error">LOBBY ERRORS GO HERE</div>
+</div>
+<div class="filter-group">
+    <label class="checkbox-label">
+        <input type="checkbox" id="showMyGamesOnly">
+        Only show my games
+    </label>
+</div>
+<div id="gamesList"></div>
             <div id="refreshTimer" class="refresh-timer"></div>
         </div>
 

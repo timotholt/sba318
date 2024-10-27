@@ -13,7 +13,8 @@ class GameApp {
             game: document.getElementById('gameScreen'),
             settings: document.getElementById('settingsScreen')
         };
-        
+
+        this.showMyGamesOnly = false;
         this.pollInterval = null;
         this.refreshTimer = null;
         this.pollDelay = 30000; // 30 seconds
@@ -72,6 +73,11 @@ class GameApp {
         document.getElementById('createGameButton').addEventListener('click', () => this.createGame());
         document.getElementById('gameName').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.createGame();
+        });
+
+        document.getElementById('showMyGamesOnly').addEventListener('change', (e) => {
+            this.showMyGamesOnly = e.target.checked;
+            this.updateGamesList();
         });
 
         document.getElementById('settingsButton').addEventListener('click', () => {
@@ -314,9 +320,12 @@ class GameApp {
         this.refreshTimer = setInterval(updateTimer, 1000);
     }
     
-    async updateGamesList() {
+     async updateGamesList() {
         try {
-            const games = await api.getGames();
+            // Pass username only if checkbox is checked
+            const games = await api.getGames(
+                this.showMyGamesOnly ? window.globalUsername : null
+            );
             renderGamesList(
                 games,
                 (gameId) => this.deleteGame(gameId),

@@ -9,12 +9,23 @@ const router = express.Router();
 
 router.get('/', async (req, res, next) => {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] GET / - Fetching all games`);
+    const username = req.query.username; // Get optional username from query params
+    
+    console.log(`[${timestamp}] GET / - Fetching games${username ? ` for user ${username}` : ''}`);
 
     try {
         const games = await GameStateDB.findAll();
         
-        const gamesWithNicknames = await Promise.all(games.map(async game => {
+        // Filter games if username is provided
+        const filteredGames = username 
+            ? games.filter(game => 
+                game.creator === username || 
+                game.players.includes(username)
+              )
+            : games;
+        
+        // Get nicknames for filtered games only
+        const gamesWithNicknames = await Promise.all(filteredGames.map(async game => {
             const playerNicknames = await Promise.all(game.players.map(async username => {
                 const user = await UserDB.findOne({ username });
                 return user?.nickname || username;
@@ -26,7 +37,7 @@ router.get('/', async (req, res, next) => {
             };
         }));
 
-        console.log(`[${timestamp}] Total games: ${games.length}`);
+        console.log(`[${timestamp}] Total games: ${gamesWithNicknames.length}`);
         res.json(gamesWithNicknames);
     } catch (error) {
         next(error);

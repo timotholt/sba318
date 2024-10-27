@@ -30,10 +30,11 @@ export const api = {
         return this.sendRequest(`/user/${username}`, 'DELETE');
     },
 
-    async getGames() {
-        return this.sendRequest('/lobby', 'GET');
+    async getGames(username = null) {
+      const url = username ? `/lobby?username=${username}` : '/lobby';
+      return this.sendRequest(url, 'GET');
     },
-
+  
     async createGame(name, creator) {
         return this.sendRequest('/lobby', 'POST', { name, creator });
     },
