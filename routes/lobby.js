@@ -1,3 +1,5 @@
+//This code changed so many times I kept all the old versions at the bottom
+
 import express from 'express';
 import { GameStateDB } from '../models/GameState.js';
 import { UserDB } from '../models/User.js';

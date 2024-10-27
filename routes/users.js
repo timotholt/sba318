@@ -25,6 +25,10 @@ router.post('/register', async (req, res, next) => {
             throw new APIError('Username and password are required', 400);
         }
 
+        // The consequence of using findOne over fineOneActive is that
+        // new users can't reuse login names of deleted users. This is actually
+        // a positive -- it eliminates the use of deleted users that were hacked,
+        // phished, etc.
         const existingUser = await UserDB.findOne({ username });
         if (existingUser) {
             throw new APIError('Username already exists', 400);
@@ -54,12 +58,10 @@ router.post('/login', validateUsername, async (req, res, next) => {
         passwordLength: req.body.password?.length || 0
     });
 
-  
-
     try {
         const { username, password } = req.body;
 
-              // Use findOneActive to exclude deleted users
+        // Use findOneActive to exclude deleted users
         const user = await UserDB.findOneActive({ username });
         if (!user || user.password !== password) {
             throw new APIError('Invalid username or password', 401);
@@ -128,26 +130,6 @@ router.patch('/change-nickname', validateNickname, async (req, res, next) => {
     }
 });
 
-
-// router.patch('/change-password', validateUsername, async (req, res, next) => {
-//     const timestamp = new Date().toISOString();
-//     console.log(`[${timestamp}] PATCH /change-password - Username: ${req.body.username}`);
-
-//     try {
-//         const { username, currentPassword, newPassword } = req.body;
-//         const user = await UserDB.findOne({ username });
-
-//         if (!user || user.password !== currentPassword) {
-//             throw new APIError('Current password is incorrect', 401);
-//         }
-
-//         await UserDB.update({ username }, { password: newPassword });
-//         res.json({ success: true });
-//     } catch (error) {
-//         next(error);
-//     }
-// });
-
 router.patch('/change-password', validateUserId, async (req, res, next) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] PATCH /change-password - UserId: ${req.body.userId}`);
@@ -166,6 +148,14 @@ router.patch('/change-password', validateUserId, async (req, res, next) => {
         next(error);
     }
 });
+
+// Delete is very complicated. We don't actually delete users from the
+// database! That would be too easy.  We mark them as soft deleted
+// so that any games they created, any chat messages they wrote, etc,
+// will still show up in the games list, in chat windows, etc. Otherwise
+// other players on the serveer will have a weird expeerience with 
+// missing games they are still playing in, chat logs missing part of
+// a conversation, etc.
 
 router.delete('/:userId', validateUserId, async (req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -203,7 +193,7 @@ router.delete('/:userId', validateUserId, async (req, res, next) => {
             }
         }
 
-        // Update all chat messages from this user
+        // Update all chat messages from this user as 'user deleted'
         await ChatDB.markUserDeleted(userId);
 
         res.json({ success: true });
@@ -213,3 +203,6 @@ router.delete('/:userId', validateUserId, async (req, res, next) => {
 });
 
 export { router };
+
+// TODO: When the server starts, we need to make a System user
+// if it doesn't exist.

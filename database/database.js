@@ -1,3 +1,8 @@
+//=================================================
+// This is the base class for the database object,
+// that utilizees the datbase engine to do I/O.
+//=================================================
+
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { getDbEngine } from './selectDbEngine.js';

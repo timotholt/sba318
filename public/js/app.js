@@ -1,6 +1,14 @@
+//==============================
+// Don't change this.   Just don't.  It finally works.
+//==============================
+
 import { api } from './api.js';
 import { showScreen, showError, renderGamesList, clearAllErrors } from './ui.js';
 import { validation } from '../../utils/validation.js';
+
+// Yea we use global variables.  I ran into so many problems
+// when all this was in the GameApp class so i said fuck it
+// and made it globals.
 
 window.globalUserId = '';
 window.globalUsername = '';
@@ -30,6 +38,7 @@ class GameApp {
         this.pollInterval = null;
         this.refreshTimer = null;      // The number we show on the screen
 
+        // I copied this code from stackoverflow.  i'm not sure what it does.
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initialize());
         } else {
@@ -37,12 +46,23 @@ class GameApp {
         }
     }
 
+    // This inits the UI.  It should be in the ui.js but I'm afraid of
+    // moving it cause it will break something.
     initialize() {
+      
+        // Add all the event handlers before showing the main screen
         this.setupEventListeners();
+      
+        // Switch to the main screen
         showScreen(this.screens, 'login');
     }
 
+    // This code is a total mess and like everything else, is super fragile
     setupEventListeners() {
+
+        //==============================
+        // Login window event handlers
+        //==============================
         document.getElementById('showRegisterButton').addEventListener('click', () => {
             showScreen(this.screens, 'register');
         });
@@ -50,9 +70,12 @@ class GameApp {
         document.getElementById('showLoginButton').addEventListener('click', () => {
             showScreen(this.screens, 'login');
         });
-
+      
+        //==============================
+        // Registration window code
+        //==============================
         document.getElementById('registerButton').addEventListener('click', () => this.handleRegister());
-        
+
         ['registerUsername', 'registerNickname', 'registerPassword', 'confirmPassword'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') this.handleRegister();
@@ -343,6 +366,9 @@ class GameApp {
         } catch (error) {
             showError('Failed to join game. Please try again.', 'lobby');
         }
+
+          // Erase game chat window
+          this.eraseChatWindow("gameChatMessages");
     }
 
     async sendLobbyChatMessage() {
@@ -395,6 +421,11 @@ class GameApp {
         }
     }
 
+    eraseChatWindow(containerId) {
+      const chatMessages = document.getElementById(containerId);
+      chatMessages.innerHTML = '';
+    }
+
     renderChatMessages(messages, containerId) {
         const chatMessages = document.getElementById(containerId);
         chatMessages.innerHTML = messages.map(msg => `
@@ -406,7 +437,9 @@ class GameApp {
         `).join('');
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-  
+
+    // The polling code is cool.  It should be setTimeout() instead
+    // of setInterval() but it works so don't fix what's not broken.
     startPolling() {
         this.stopPolling();
         this.updateGamesList();
@@ -415,6 +448,7 @@ class GameApp {
         this.startRefreshTimer();
     }
 
+    // We call this on logout to keep the UI from making vscode slow.
     stopPolling() {
         if (this.pollInterval) {
             clearInterval(this.pollInterval);
@@ -430,6 +464,8 @@ class GameApp {
         }
     }
 
+    // This code makes a fake timer on the screen. It doesn't actually corelate with the actual
+    // server refresh. it's a hack that grew out of control.
     startRefreshTimer() {
         const timerElement = document.getElementById('refreshTimer');
         let timeLeft = this.pollDelay / 1000;
@@ -440,6 +476,9 @@ class GameApp {
 
             if (timeLeft < 0) {
                 timeLeft = this.pollDelay / 1000;
+
+              // TODO: I should update the server list here but I couldn't get it to work.
+              // Now that the code has been restructured so many times, it might work.
             }
         };
 
@@ -447,6 +486,7 @@ class GameApp {
         this.refreshTimer = setInterval(updateTimer, 1000);
     }
 
+    // We only update the lobby chat or the game chat, but not both.
     async updateChat() {
         if (this.currentGameId) {
             await this.updateGameChat();
@@ -454,9 +494,11 @@ class GameApp {
             await this.updateLobbyChat();
         }
     }
-
+  
+    // Super clean and super elegant.
     async updateGamesList() {
         try {
+            // if the checkbox is set, pass the user's id to the server
             const games = await api.getGames(
                 this.showMyGamesOnly ? window.globalUserId : null
             );

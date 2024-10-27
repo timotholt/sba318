@@ -1,3 +1,12 @@
+//=================================================
+// This is the in-memory database engine.  I
+// broke this so many times over and over,
+// I had to ask Gemini and Bolt to help me fix it.
+// It's so fragile so don't change anything.
+//
+// I won't even format it or add white space.
+//=================================================
+
 import { BaseDbEngine } from './BaseDbEngine.js';
 
 export class InMemoryDbEngine extends BaseDbEngine {

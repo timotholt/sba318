@@ -1,3 +1,10 @@
+//=================================================
+// I got into a lot of trouble when I had all the
+// app and ui code making server calls directly, so
+// I cominbed everything into api.js.
+//=================================================
+
+
 export const api = {
     async register(username, password, nickname) {
         const response = await this.sendRequest('/user/register', 'POST', { 

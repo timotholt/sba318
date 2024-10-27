@@ -1,3 +1,6 @@
+// This started off as a good idea but ended up being a nightmare.
+// After submitting to class, delete it.
+
 import { validation } from '../utils/validation.js';
 
 // Username validation middleware

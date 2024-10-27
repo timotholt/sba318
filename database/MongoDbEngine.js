@@ -1,3 +1,15 @@
+//=================================================
+// This is the mongo database engine.  I
+// broke this so many times over and over,
+// I had to ask Gemini and Bolt to help me fix it.
+//
+// AND I DONT EVEN KNOW IF IT WORKS.
+//
+// It's so fragile so don't change anything.
+//
+// I won't even format it or add white space.
+//=================================================
+
 import { BaseDbEngine } from './BaseDbEngine.js';
 
 export class MongoDbEngine extends BaseDbEngine {
