@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { db } from '../database/database.js';
+import crypto from 'crypto';
 
 const gameStateSchema = new mongoose.Schema({
   id: {
@@ -54,7 +55,8 @@ export const GameStateDB = {
   async create(gameData) {
     return await db.getEngine().create(GameState, {
       ...gameData,
-      id: Date.now().toString()
+      // id: Date.now().toString()
+      id: crypto.randomUUID()
     });
   },
 

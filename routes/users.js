@@ -185,4 +185,44 @@ router.patch('/change-password', validateUsername, async (req, res) => {
     }
 });
 
+router.post('/delete-account', validateUsername, async (req, res) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] POST /delete-account - Username: ${req.body.username}`);
+
+    try {
+        const { username } = req.body;
+        const result = await UserDB.delete({ username });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Clean up any existing game memberships
+        const games = await GameStateDB.findAll();
+        for (const game of games) {
+            const playerIndex = game.players.indexOf(username);
+            if (playerIndex !== -1) {
+                // Remove player and their nickname
+                game.players.splice(playerIndex, 1);
+                game.playerNicknames.splice(playerIndex, 1);
+                await GameStateDB.update({ id: game.id }, { 
+                    players: game.players,
+                    playerNicknames: game.playerNicknames 
+                });
+            }
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error(`[${timestamp}] Delete account error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete account'
+        });
+    }
+});
+
 export { router };

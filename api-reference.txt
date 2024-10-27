@@ -1,0 +1,244 @@
+Game Lobby API Reference
+=======================
+
+Base URL: /
+Content-Type: application/json
+
+Authentication Endpoints
+----------------------
+
+1. Register User
+   Endpoint: POST /user/register
+   Description: Creates a new user account
+   Request Body:
+   {
+     "username": "string",     // Required
+     "password": "string",     // Required
+     "nickname": "string"      // Optional, defaults to username
+   }
+   Response: 
+   {
+     "success": true,
+     "message": "Registration successful"
+   }
+   Errors:
+   - 400: Username and password are required
+   - 400: Username already exists
+   - 500: Registration failed
+
+2. Login
+   Endpoint: POST /user/login
+   Description: Authenticates a user
+   Request Body:
+   {
+     "username": "string",
+     "password": "string"
+   }
+   Response:
+   {
+     "success": true,
+     "nickname": "string"
+   }
+   Errors:
+   - 401: Invalid username or password
+   - 500: Login failed
+
+3. Logout
+   Endpoint: POST /user/logout
+   Description: Logs out user and removes them from any games
+   Request Body:
+   {
+     "username": "string"
+   }
+   Response:
+   {
+     "success": true
+   }
+   Errors:
+   - 400: Valid username is required
+   - 500: Logout failed
+
+Profile Management Endpoints
+--------------------------
+
+1. Change Nickname
+   Endpoint: PATCH /user/change-nickname
+   Description: Updates user's display name
+   Request Body:
+   {
+     "username": "string",
+     "nickname": "string"
+   }
+   Response:
+   {
+     "success": true
+   }
+   Errors:
+   - 400: Nickname cannot be empty
+   - 500: Failed to change nickname
+
+2. Change Password
+   Endpoint: PATCH /user/change-password
+   Description: Updates user's password
+   Request Body:
+   {
+     "username": "string",
+     "currentPassword": "string",
+     "newPassword": "string"
+   }
+   Response:
+   {
+     "success": true
+   }
+   Errors:
+   - 401: Current password is incorrect
+   - 500: Failed to change password
+
+Game Lobby Endpoints
+------------------
+
+1. Get All Games
+   Endpoint: GET /lobby
+   Description: Retrieves list of all active games
+   Response:
+   [
+     {
+       "id": "string",
+       "name": "string",
+       "creator": "string",
+       "creatorNickname": "string",
+       "maxPlayers": number,
+       "players": ["string"],
+       "playerNicknames": ["string"],
+       "created": "date"
+     }
+   ]
+   Errors:
+   - 500: Failed to retrieve games
+
+2. Create Game
+   Endpoint: POST /lobby
+   Description: Creates a new game
+   Request Body:
+   {
+     "name": "string",
+     "creator": "string",
+     "maxPlayers": number    // Optional, 1-4, defaults to 4
+   }
+   Response:
+   {
+     "success": true,
+     "game": {
+       "id": "string",
+       "name": "string",
+       "creator": "string",
+       "creatorNickname": "string",
+       "maxPlayers": number,
+       "players": [],
+       "playerNicknames": [],
+       "created": "date"
+     }
+   }
+   Errors:
+   - 400: Game name and creator are required
+   - 400: Max players must be between 1 and 4
+   - 400: Game name already exists
+   - 500: Failed to create game
+
+3. Join Game
+   Endpoint: POST /lobby/:id/join
+   Description: Adds user to a game
+   URL Parameters:
+   - id: Game ID
+   Request Body:
+   {
+     "username": "string"
+   }
+   Response:
+   {
+     "success": true,
+     "game": {
+       // Full game object
+     }
+   }
+   Errors:
+   - 404: Game not found
+   - 400: Game is full
+   - 404: User not found
+   - 500: Failed to join game
+
+4. Leave Game
+   Endpoint: POST /lobby/:id/leave
+   Description: Removes user from a game
+   URL Parameters:
+   - id: Game ID
+   Request Body:
+   {
+     "username": "string"
+   }
+   Response:
+   {
+     "success": true,
+     "game": {
+       // Full game object
+     }
+   }
+   Errors:
+   - 404: Game not found
+   - 400: User not in game
+   - 500: Failed to leave game
+
+5. Delete Game
+   Endpoint: DELETE /lobby/:id
+   Description: Removes a game (creator only)
+   URL Parameters:
+   - id: Game ID
+   Query Parameters:
+   - username: Creator's username
+   Response:
+   {
+     "success": true
+   }
+   Errors:
+   - 400: Username is required
+   - 404: Game not found
+   - 403: Only the creator can delete the game
+   - 500: Failed to delete game
+
+Administrative Endpoints
+----------------------
+
+1. Get MongoDB Admin URL
+   Endpoint: GET /user/admin-url
+   Description: Retrieves MongoDB admin interface URL
+   Response:
+   {
+     "url": "string"
+   }
+
+Error Response Format
+-------------------
+All error responses follow this format:
+{
+  "success": false,
+  "message": "string"    // Human-readable error message
+}
+
+HTTP Status Codes
+---------------
+- 200: Success
+- 400: Bad Request (invalid input)
+- 401: Unauthorized (invalid credentials)
+- 403: Forbidden (insufficient permissions)
+- 404: Not Found
+- 500: Internal Server Error
+
+Notes
+-----
+1. All endpoints require Content-Type: application/json header
+2. Dates are returned in ISO 8601 format
+3. Game IDs are unique strings generated from timestamps
+4. Nicknames are used for display purposes in the game lobby
+5. The server supports both in-memory and MongoDB storage
+6. Real-time updates require polling the /lobby endpoint
+
