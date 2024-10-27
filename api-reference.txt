@@ -132,11 +132,8 @@ Game Lobby Endpoints
        "name": "string",
        "creator": "string",   // Creator's UUID
        "maxPlayers": number,  // 1-4
-       "players": [           // Array of player objects
-         {
-           "userId": "string",
-           "nickname": "string"
-         }
+       "players": [           // Array of player IDs
+         "string"            // Player UUID
        ],
        "created": "date"      // ISO 8601
      }
@@ -236,6 +233,7 @@ Chat Endpoints
    Query Parameters:
    - type: Required ('lobby' or 'game')
    - gameId: Required for game chat (UUID)
+   - userId: Optional. If provided, includes private messages for this user
    Response:
    [
      {
@@ -245,12 +243,19 @@ Chat Endpoints
        "nickname": "string", // Current or last known nickname
        "message": "string",
        "timestamp": "date",  // ISO 8601
-       "deleted": boolean    // True if user was deleted
+       "deleted": boolean,   // True if user was deleted
+       "private": boolean,   // True for private messages
+       "recipientId": "string" // UUID of recipient for private messages
      }
    ]
+   Notes:
+   - Without userId, only public messages are returned
+   - Private messages are only visible to sender and recipient
+   - System messages (userId: 00000000-0000-0000-0000-000000000000) are always visible
    Errors:
    - 400: Valid chat type required
    - 404: Game not found (for game chat)
+   - 403: Not authorized to view game messages
    - 500: Failed to retrieve messages
 
 2. Send Message
@@ -270,12 +275,20 @@ Chat Endpoints
        // Full message object
      }
    }
+   Notes:
+   - Messages starting with '/' are treated as commands
+   - Available commands:
+     * /help - Show available commands
+     * /nick <new_nickname> - Change nickname
+     * /msg <user> <message> - Send private message
+     * /kick <user> - Kick user from game (creator only)
    Errors:
    - 400: Invalid message type
    - 400: Message too long
    - 404: User not found
    - 404: Game not found (for game chat)
    - 403: User not in game (for game chat)
+   - 400: Unknown command
    - 500: Failed to send message
 
 3. Delete Game Chat
@@ -339,6 +352,8 @@ Notes
 11. Account deletion is a soft delete
 12. Game creator cannot be removed from their own game
 13. Chat messages retain original sender info even if user is deleted
+14. System messages use special userId: 00000000-0000-0000-0000-000000000000
+15. Private messages are only visible to sender and recipient
 
 Security Features
 ---------------

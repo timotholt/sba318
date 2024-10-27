@@ -32,20 +32,69 @@ class ChatService {
         return await ChatDB.findByGame(gameId);
     }
 
-    async getMessages(type, gameId = null) {
-        if (!type || !['lobby', 'game'].includes(type)) {
-            throw new APIError('Valid chat type (lobby/game) is required', 400);
+    // async getMessages(type, gameId = null) {
+    //     if (!type || !['lobby', 'game'].includes(type)) {
+    //         throw new APIError('Valid chat type (lobby/game) is required', 400);
+    //     }
+
+    //     if (type === 'lobby') {
+    //         return await this.getLobbyMessages();
+    //     } else {
+    //         if (!gameId) {
+    //             throw new APIError('Game ID is required for game chat', 400);
+    //         }
+    //         return await this.getGameMessages(gameId);
+    //     }
+    // }
+
+  async getMessages(type, gameId = null, userId = null) {
+    if (!type || !['lobby', 'game'].includes(type)) {
+        throw new APIError('Valid chat type (lobby/game) is required', 400);
+    }
+
+    // Get base messages
+    let messages;
+    if (type === 'lobby') {
+        messages = await ChatDB.findByType('lobby');
+    } else {
+        if (!gameId) {
+            throw new APIError('Game ID is required for game chat', 400);
         }
 
-        if (type === 'lobby') {
-            return await this.getLobbyMessages();
-        } else {
-            if (!gameId) {
-                throw new APIError('Game ID is required for game chat', 400);
-            }
-            return await this.getGameMessages(gameId);
+        const game = await GameStateDB.findOne({ id: gameId });
+        if (!game) {
+            throw new APIError('Game not found', 404);
         }
+
+        // For game chat, require userId
+        if (!userId) {
+            throw new APIError('User ID required for game chat', 400);
+        }
+
+        // Only allow players in the game to see game messages
+        if (!await GameStateDB.isPlayerInGame(gameId, userId)) {
+            throw new APIError('Not authorized to view game messages', 403);
+        }
+
+        messages = await ChatDB.findByGame(gameId);
     }
+
+    // Filter messages based on visibility
+    return messages.filter(msg => {
+        // System messages are always visible
+        if (msg.userId === '00000000-0000-0000-0000-000000000000') return true;
+
+        // Public messages are always visible
+        if (!msg.private) return true;
+
+        // Private messages only visible if userId provided and matches sender/recipient
+        if (msg.private) {
+            return userId && (msg.userId === userId || msg.recipientId === userId);
+        }
+
+        return true;
+    });
+}
 
     async createMessage(type, userId, message, gameId = null) {
 
@@ -92,6 +141,19 @@ class ChatService {
 
             if (!await GameStateDB.isPlayerInGame(gameId, userId)) {
                 throw new APIError('User is not in this game', 403);
+            }
+        }
+
+        // Chat commands (/) invoke the ChatCommandService
+        if (message.startsWith('/')) {
+            const wasProcessed = await chatCommandService.processCommand(
+                type, 
+                userId, 
+                message, 
+                gameId
+            );
+            if (wasProcessed) {
+                return null; // Command was handled
             }
         }
 

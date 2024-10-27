@@ -112,10 +112,36 @@ body::before {
 #gameScreen {
   max-width: 800px;
   min-width: 800px;
+  
+  padding: 25px;
+  box-sizing: border-box;
+  margin: 20px auto;
+  /* min-height: 600px; */
+  /* max-height: 600px; */
+}
+
+#gameContent {
+  width: 100%;
+  height: 500px;
+  
+  margin: 0; padding: 0; box-sizing: border-box;
+  
+  background: var(--bg-darker);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+}
+
+#gameContent:hover {
+  border: 1px solid var(--accent-hover);
+  box-shadow: var(--glow);
 }
 
 #gameScreen .header {
+    width: 100%;
     margin-bottom: 15px; /* Smaller margin than lobby */
+  box-sizing: border-box;
 }
 
 #gameScreen .header h2 {
@@ -138,6 +164,18 @@ body::before {
     box-shadow: var(--glow-danger);
 }
 
+#gameScreen .chat-container {
+  margin-top: 0;  /* Remove top margin since it's at bottom */
+  height: 250px;  /* Make chat area shorter */
+  width:  100%;
+}
+
+#gameScreen .chat-messages {
+  max-height: 150px;  /* Adjust scrollable area height */
+  min-height: 150px;
+  /* margin: 12px; */
+}
+
 .screen:hover {
     transform: translateY(-2px); */
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
@@ -150,16 +188,6 @@ body::before {
     background: rgba(5, 5, 5, 0.8); */
 }
 
-/* .width-600 {
-  min-width: 600px;
-  max-width: 600px;
-}
-
-.width-800  {
-  min-width: 800px;
-  max-width: 800px;
-}
- */
 .form-group {
     margin: 20px 0;
     display: flex;
@@ -386,22 +414,13 @@ button:hover {
 }
 
 .game-buttons button {
-    /* padding: 8px 16px; */
     padding: 4px 8px;
     margin: 0;
     font-size: 0.9em;
 }
 
-  
-/* .game-item {
-    display: flex;
-    border-radius: 12px;
-    padding: 2px;
-    transition: var(--transition);
-} */
-
 .game-item:hover {
-    transform: translateY(4px);
+    transform: translateX(4px);
 }
 
 .miniStatusRow {
@@ -476,12 +495,8 @@ button:hover {
 
 .chat-message {
     background: var(--bg-darker);
-    /* padding: 12px; */
     padding: 2px;
-    /* border-radius: 12px; */
-    /* margin-bottom: 10px; */
     transition: var(--transition);
-    /* border: 1px solid rgba(255, 255, 255, 0.03); */
 
     /* Fade in when it appears -- causes bad flicker */
     /* animation: fadeIn 0.3s ease-out;
@@ -501,6 +516,7 @@ button:hover {
  */
 .chat-message:hover {
     transform: translateX(4px);
+  /* transform: scale(1.5);  DOESN'T WORK WELL */
     box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.2);
 }
 

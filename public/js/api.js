@@ -73,11 +73,19 @@ export const api = {
     },
 
     async getLobbyChat() {
-        return this.sendRequest('/chat?type=lobby', 'GET');
+        return this.sendRequest(`/chat?type=lobby&userId=${window.globalUserId}`, 'GET');
     },
 
     async getGameChat(gameId) {
-        return this.sendRequest(`/chat?type=game&gameId=${gameId}`, 'GET');
+        return this.sendRequest(`/chat?type=game&gameId=${gameId}&userId=${window.globalUserId}`, 'GET');
+    },
+
+    // Add new method for public messages only
+    async getPublicChat(type, gameId = null) {
+        const url = type === 'lobby' 
+            ? '/chat?type=lobby'
+            : `/chat?type=game&gameId=${gameId}`;
+        return this.sendRequest(url, 'GET');
     },
 
     async sendLobbyMessage(message) {

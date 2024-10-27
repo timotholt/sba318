@@ -38,6 +38,16 @@ const chatSchema = new mongoose.Schema({
     timestamp: {
         type: Date,
         default: Date.now
+    },
+    private: {
+        type: Boolean,
+        default: false
+    },
+    recipientId: {
+        type: String,
+        required: function() { 
+            return this.private === true; 
+        }
     }
 });
 

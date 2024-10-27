@@ -9,10 +9,10 @@ const router = express.Router();
 // GET /chat?type=lobby
 // GET /chat?type=game&gameId=
 router.get('/', async (req, res, next) => {
-    const { type, gameId } = req.query;
+    const { type, gameId, userId } = req.query;
     
     try {
-        const messages = await chatService.getMessages(type, gameId);
+        const messages = await chatService.getMessages(type, gameId, userId);
         res.json(messages);
     } catch (error) {
         next(error);
