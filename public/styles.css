@@ -221,3 +221,52 @@ button:hover {
     color: #444;
     margin-bottom: 5px;
 }
+
+/* Chat styles */
+.chat-container {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.chat-input input {
+    flex: 1;
+    margin: 0 10px 0 0;
+}
+
+.chat-message {
+    margin-bottom: 8px;
+    word-wrap: break-word;
+}
+
+.chat-nickname {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.chat-timestamp {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 8px;
+}
+
+.chat-input button {
+    width: auto;
+    margin: 0;
+    padding: 8px 16px;
+}

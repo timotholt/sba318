@@ -1,6 +1,7 @@
 import express from 'express';
 import { GameStateDB } from '../models/GameState.js';
 import { UserDB } from '../models/User.js';
+import { ChatDB } from '../models/Chat.js';
 import { APIError } from '../middleware/errorHandling.js';
 import dotenv from 'dotenv';
 
@@ -200,7 +201,12 @@ router.delete('/:id', async (req, res, next) => {
             throw new APIError('Only the creator can delete the game', 403);
         }
 
+        // Delete teh game
         await GameStateDB.delete({ id });
+
+        // After deleting the game, also delete its chat messages
+        await ChatDB.deleteByGame(id);
+
         console.log(`[${timestamp}] Game deleted successfully:`, game);
         res.json({ success: true });
     } catch (error) {

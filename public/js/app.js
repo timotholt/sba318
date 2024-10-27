@@ -14,6 +14,7 @@ class GameApp {
             settings: document.getElementById('settingsScreen')
         };
 
+        this.lastChatUpdate = 0;
         this.showMyGamesOnly = false;
         this.pollInterval = null;
         this.refreshTimer = null;
@@ -79,6 +80,29 @@ class GameApp {
             this.showMyGamesOnly = e.target.checked;
             this.updateGamesList();
         });
+
+        // // Chat listeners
+        // document.getElementById('sendChatMessage').addEventListener('click', () =>
+        //     this.sendChatMessage());
+      
+        // document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        //     if (e.key === 'Enter') this.sendChatMessage();
+        // });
+
+      // Chat listeners
+      document.getElementById('sendLobbyChatMessage').addEventListener('click', () => 
+          this.sendLobbyChatMessage());
+      
+      document.getElementById('lobbyChatInput').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') this.sendLobbyChatMessage();
+      });
+      
+      document.getElementById('sendGameChatMessage').addEventListener('click', () => 
+          this.sendGameChatMessage());
+      
+      document.getElementById('gameChatInput').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') this.sendGameChatMessage();
+      });
 
         document.getElementById('settingsButton').addEventListener('click', () => {
             document.getElementById('currentNickname').value = window.globalNickname;
@@ -284,7 +308,108 @@ class GameApp {
             showError('Failed to join game. Please try again.', 'lobby');
         }
     }
+
+//   // Add these methods to GameApp class
+// async sendChatMessage() {
+//     const input = document.getElementById('chatInput');
+//     const message = input.value.trim();
     
+//     if (message && this.currentGameId) {
+//         try {
+//             await api.sendChatMessage(this.currentGameId, window.globalUsername, message);
+//             input.value = '';
+//             await this.updateChat();
+//         } catch (error) {
+//             showError('Failed to send message', 'game');
+//         }
+//     }
+// }
+
+// async updateChat() {
+//     if (!this.currentGameId) return;
+    
+//     try {
+//         const messages = await api.getGameMessages(this.currentGameId);
+//         this.renderChatMessages(messages);
+//     } catch (error) {
+//         console.error('Failed to update chat:', error);
+//     }
+// }
+
+// renderChatMessages(messages) {
+//     const chatMessages = document.getElementById('chatMessages');
+//     chatMessages.innerHTML = messages.map(msg => `
+//         <div class="chat-message">
+//             <span class="chat-nickname">${msg.nickname}:</span>
+//             ${msg.message}
+//             <span class="chat-timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+//         </div>
+//     `).join('');
+//     chatMessages.scrollTop = chatMessages.scrollHeight;
+// }
+
+async sendLobbyChatMessage() {
+    const input = document.getElementById('lobbyChatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        try {
+            await api.sendLobbyMessage(message);
+            input.value = '';
+            await this.updateLobbyChat();
+        } catch (error) {
+            showError('Failed to send message', 'lobby');
+        }
+    }
+}
+
+async sendGameChatMessage() {
+    const input = document.getElementById('gameChatInput');
+    const message = input.value.trim();
+    
+    if (message && this.currentGameId) {
+        try {
+            await api.sendGameMessage(this.currentGameId, message);
+            input.value = '';
+            await this.updateGameChat();
+        } catch (error) {
+            showError('Failed to send message', 'game');
+        }
+    }
+}
+
+async updateLobbyChat() {
+    try {
+        const messages = await api.getLobbyChat();
+        this.renderChatMessages(messages, 'lobbyChatMessages');
+    } catch (error) {
+        console.error('Failed to update lobby chat:', error);
+    }
+}
+
+async updateGameChat() {
+    if (!this.currentGameId) return;
+    
+    try {
+        const messages = await api.getGameChat(this.currentGameId);
+        this.renderChatMessages(messages, 'gameChatMessages');
+    } catch (error) {
+        console.error('Failed to update game chat:', error);
+    }
+}
+
+renderChatMessages(messages, containerId) {
+    const chatMessages = document.getElementById(containerId);
+    chatMessages.innerHTML = messages.map(msg => `
+        <div class="chat-message">
+            <span class="chat-nickname">${msg.nickname}:</span>
+            ${msg.message}
+            <span class="chat-timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+        </div>
+    `).join('');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+  
     startPolling() {
         this.stopPolling();
         this.updateGamesList();
@@ -320,21 +445,49 @@ class GameApp {
         this.refreshTimer = setInterval(updateTimer, 1000);
     }
     
-     async updateGamesList() {
-        try {
-            // Pass username only if checkbox is checked
-            const games = await api.getGames(
-                this.showMyGamesOnly ? window.globalUsername : null
-            );
-            renderGamesList(
-                games,
-                (gameId) => this.deleteGame(gameId),
-                (gameId) => this.joinGame(gameId)
-            );
-        } catch (error) {
-            console.error('Failed to update games list:', error);
-        }
-    }
+    //  async updateGamesList() {
+    //     try {
+    //         // Pass username only if checkbox is checked
+    //         const games = await api.getGames(
+    //             this.showMyGamesOnly ? window.globalUsername : null
+    //         );
+    //         renderGamesList(
+    //             games,
+    //             (gameId) => this.deleteGame(gameId),
+    //             (gameId) => this.joinGame(gameId)
+    //         );
+
+    //         // Update chat if in a game
+    //         if (this.currentGameId) {
+    //             await this.updateChat();
+    //         }
+          
+    //     } catch (error) {
+    //         console.error('Failed to update games list:', error);
+    //     }
+    // }
+
+    async updateGamesList() {
+      try {
+          const games = await api.getGames(
+              this.showMyGamesOnly ? window.globalUsername : null
+          );
+          renderGamesList(
+              games,
+              (gameId) => this.deleteGame(gameId),
+              (gameId) => this.joinGame(gameId)
+          );
+  
+          // Update appropriate chat based on current screen
+          if (this.currentGameId) {
+              await this.updateGameChat();
+          } else {
+              await this.updateLobbyChat();
+          }
+      } catch (error) {
+          console.error('Failed to update:', error);
+      }
+   }
 }
 
 new GameApp();

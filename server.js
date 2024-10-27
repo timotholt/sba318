@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { router as userRoutes } from './routes/users.js';
 import { router as lobbyRoutes } from './routes/lobby.js';
 import { router as adminRoutes } from './routes/admin.js';
+import { router as chatRoutes } from './routes/chat.js';
 import { db } from './database/database.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandling.js';
@@ -45,6 +46,7 @@ app.use(express.static('public'));
 // Routes
 app.use('/user', userRoutes);
 app.use('/lobby', lobbyRoutes);
+app.use('/chat', chatRoutes);
 app.use('/admin', adminRoutes);
 
 // Root route

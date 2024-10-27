@@ -46,19 +46,28 @@
                     <button id="logoutButton" class="logout-btn">Logout</button>
                 </div>
             </div>
-<div class="form-group">
-    <input type="text" id="gameName" placeholder="Enter game name">
-    <button id="createGameButton">Create Game</button>
-    <div id="lobbyError" class="error">LOBBY ERRORS GO HERE</div>
-</div>
-<div class="filter-group">
-    <label class="checkbox-label">
-        <input type="checkbox" id="showMyGamesOnly">
-        Only show my games
-    </label>
-</div>
-<div id="gamesList"></div>
+            <div class="form-group">
+                <input type="text" id="gameName" placeholder="Enter game name">
+                <button id="createGameButton">Create Game</button>
+                <div id="lobbyError" class="error">LOBBY ERRORS GO HERE</div>
+            </div>
+            <div class="filter-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showMyGamesOnly">
+                    Only show my games
+                </label>
+            </div>
+            <div id="gamesList"></div>
             <div id="refreshTimer" class="refresh-timer"></div>
+            <!-- Add inside #gameScreen div in public/index.html -->
+    <!-- ... other lobby content ... -->
+    <div id="lobbyChatContainer" class="chat-container">
+        <div id="lobbyChatMessages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="lobbyChatInput" placeholder="Type a message...">
+            <button id="sendLobbyChatMessage">Send</button>
+        </div>
+    </div>
         </div>
 
         <div id="settingsScreen" class="screen hidden">
@@ -89,6 +98,14 @@
             <h2>Game</h2>
             <div id="gameContent"></div>
             <button id="backToLobbyButton">Back to Lobby</button>
+            <!-- ... other game content ... -->
+            <div id="gameChatContainer" class="chat-container">
+                <div id="gameChatMessages" class="chat-messages"></div>
+                <div class="chat-input">
+                    <input type="text" id="gameChatInput" placeholder="Type a message...">
+                    <button id="sendGameChatMessage">Send</button>
+                </div>
+            </div>
             <div id="gameError" class="error">GAME ERRORS GO HERE</div>
         </div>
     </div>

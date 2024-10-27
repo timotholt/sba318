@@ -2,6 +2,7 @@ import express from 'express';
 import { validateUsername } from '../middleware/validation.js';
 import { UserDB } from '../models/User.js';
 import { GameStateDB } from '../models/GameState.js';
+import { ChatDB } from '../models/Chat.js';
 import { APIError } from '../middleware/errorHandling.js';
 import dotenv from 'dotenv';
 
@@ -59,21 +60,6 @@ router.post('/login', validateUsername, async (req, res, next) => {
             throw new APIError('Invalid username or password', 401);
         }
 
-        // // NEW CODE: Clean up any existing game memberships
-        // const games = await GameStateDB.findAll();
-        // for (const game of games) {
-        //     const playerIndex = game.players.indexOf(username);
-        //     if (playerIndex !== -1) {
-        //         // Remove player and their nickname
-        //         game.players.splice(playerIndex, 1);
-        //         game.playerNicknames.splice(playerIndex, 1);
-        //         await GameStateDB.update({ id: game.id }, { 
-        //             players: game.players,
-        //             playerNicknames: game.playerNicknames 
-        //         });
-        //     }
-        // }
-      
         console.log(`[${timestamp}] Login successful for user: ${username}`);
         res.json({ 
             success: true,
@@ -175,6 +161,15 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
             );
         }
 
+        // Update all chat messages from this user
+        await ChatDB.update(
+            { username: username },
+            { 
+                nickname: "Deleted User",
+                username: "deleted_" + username
+            }
+        );
+
         // Delete all games they created (should be empty now)
         await GameStateDB.delete({ creator: username });
 
@@ -202,7 +197,5 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
         next(error);
     }
 });
-
-
 
 export { router };
