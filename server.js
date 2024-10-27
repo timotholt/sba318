@@ -42,6 +42,7 @@ app.use(requestLogger);
 
 // Static files
 app.use(express.static('public'));
+app.use('/utils', express.static('utils'));
 
 // Routes
 app.use('/user', userRoutes);

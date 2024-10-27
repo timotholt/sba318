@@ -14,7 +14,6 @@ export const api = {
             password 
         });
 
-      window.alert(`user id = ${response.userId}`);
         window.globalUserId = response.userId; // Store userId on successful login
         return response;
     },

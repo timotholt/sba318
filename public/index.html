@@ -32,9 +32,19 @@
             <h2>Register</h2>
             <div class="form-group">
                 <input type="text" id="registerUsername" placeholder="Choose username">
+              <!-- <input type="text" 
+       id="registerUsername" 
+       placeholder="Choose username"
+       onkeyup="this.value = this.value.toLowerCase()"
+       required>
+               -->
                 <input type="text" id="registerNickname" placeholder="Choose nickname (optional)">
                 <input type="password" id="registerPassword" placeholder="Choose password">
-                <input type="password" id="confirmPassword" placeholder="Confirm password">
+              <!-- <input type="password" 
+       id="registerPassword" 
+       placeholder="Choose password"
+       required> -->
+                <input type="password" id="confirmPassword" placeholder="Confirm password" requierd>
                 <button id="registerButton">Register</button>
                 <div id="registerError" class="error"></div>
             </div>

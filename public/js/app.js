@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { showScreen, showError, renderGamesList, clearAllErrors } from './ui.js';
+import { validation } from '../../utils/validation.js';
 
 window.globalUserId = '';
 window.globalUsername = '';
@@ -17,10 +18,18 @@ class GameApp {
 
         this.lastChatUpdate = 0;
         this.showMyGamesOnly = false;
-        this.pollInterval = null;
-        this.refreshTimer = null;
-        this.pollDelay = 30000; // 30 seconds
+
         this.currentGameId = null;
+
+        // This controls how often we poll the server for new chat messages
+        this.chatDelay    = 1000;      // 1 second
+        this.chatInterval = null;
+
+        // This controls how often we poll the server for a new game list
+        this.pollDelay    = 5000;     // 5 seconds
+        this.pollInterval = null;
+        this.refreshTimer = null;      // The number we show on the screen
+
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initialize());
@@ -130,6 +139,17 @@ class GameApp {
         const nickname = document.getElementById('registerNickname').value.trim();
         const password = document.getElementById('registerPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
+
+       // Client-side validation
+    if (!validation.username.pattern.test(username)) {
+        showError(validation.username.message, 'register');
+        return;
+    }
+
+    if (!validation.password.pattern.test(password)) {
+        showError(validation.password.message, 'register');
+        return;
+    }
         
         if (!username || !password) {
             showError('Please enter both username and password', 'register');
@@ -159,7 +179,18 @@ class GameApp {
     async handleLogin() {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
-        
+
+   // Client-side validation
+    if (!validation.username.pattern.test(username)) {
+        showError(validation.username.message, 'login');
+        return;
+    }
+
+    if (!validation.password.pattern.test(password)) {
+        showError(validation.password.message, 'login');
+        return;
+    }
+      
         if (!username || !password) {
             showError('Please enter both username and password', 'login');
             return;
@@ -168,9 +199,6 @@ class GameApp {
         try {
             const response = await api.login(username, password);
             if (response?.success) {
-
-
-              window.alert(`response.userId = ${response.userId}`);
                 window.globalUserId = response.userId;
                 window.globalUsername = username;
                 window.globalNickname = response.nickname || username;
@@ -210,6 +238,11 @@ class GameApp {
             showError('Please enter a nickname', 'settings');
             return;
         }
+
+        if (!validation.nickname.pattern.test(nickname)) {
+            showError(validation.nickname.message, 'settings');
+        return;
+    }
 
         try {
             const response = await api.changeNickname(window.globalUserId, nickname);
@@ -379,6 +412,7 @@ class GameApp {
         this.stopPolling();
         this.updateGamesList();
         this.pollInterval = setInterval(() => this.updateGamesList(), this.pollDelay);
+        this.chatInterval = setInterval(() => this.updateChat(), this.chatDelay);
         this.startRefreshTimer();
     }
 
@@ -410,6 +444,14 @@ class GameApp {
         this.refreshTimer = setInterval(updateTimer, 1000);
     }
 
+  async updateChat() {
+    if (this.currentGameId) {
+        await this.updateGameChat();
+    } else {
+        await this.updateLobbyChat();
+    }
+}
+
     async updateGamesList() {
         try {
             const games = await api.getGames(
@@ -420,17 +462,11 @@ class GameApp {
                 (gameId) => this.deleteGame(gameId),
                 (gameId) => this.joinGame(gameId)
             );
-
-            // Update appropriate chat based on current screen
-            if (this.currentGameId) {
-                await this.updateGameChat();
-            } else {
-                await this.updateLobbyChat();
-            }
         } catch (error) {
             console.error('Failed to update:', error);
         }
     }
 }
 
+// TIM - DO NOT DELETE THIS LINE
 new GameApp();

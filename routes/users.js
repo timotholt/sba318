@@ -1,5 +1,6 @@
 import express from 'express';
-import { validateUsername } from '../middleware/validation.js';
+import { validateUsername, validateNickname, validateUserId } from '../middleware/validation.js';
+import { validation } from '../utils/validation.js';
 import { UserDB } from '../models/User.js';
 import { GameStateDB } from '../models/GameState.js';
 import { ChatDB } from '../models/Chat.js';
@@ -75,46 +76,54 @@ router.get('/admin-url', (req, res) => {
     res.json({ url: process.env.MONGO_ADMIN_URL });
 });
 
-router.post('/logout', validateUsername, async (req, res, next) => {
+router.post('/logout', validateUserId, async (req, res, next) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /logout - Parameters:`, {
-        username: req.body.username
+        userId : req.body.userId
     });
 
     try {
-        const { username } = req.body;
+        const { userId } = req.body;
         const games = await GameStateDB.findAll();
         
         for (const game of games) {
-            if (game.players.includes(username)) {
-                game.players = game.players.filter(p => p !== username);
-                await GameStateDB.update({ id: game.id }, { players: game.players });
+            if (await GameStateDB.isPlayerInGame(game.id, userId)) {
+                await GameStateDB.removePlayer(game.id, userId);
             }
         }
-        
-        console.log(`[${timestamp}] Logout successful for user: ${username}`);
+      
         res.json({ success: true });
     } catch (error) {
         next(error);
     }
 });
 
-router.patch('/change-nickname', validateUsername, async (req, res, next) => {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] PATCH /change-nickname - Username: ${req.body.username}`);
-
+router.patch('/change-nickname', validateNickname, async (req, res, next) => {
     try {
-        const { username, nickname } = req.body;
-        if (!nickname || nickname.trim().length === 0) {
+        const { userId, nickname } = req.body;
+      
+        // Trim the nickname
+        const trimmedNickname = validation.trim.nickname(nickname);
+        
+        if (!trimmedNickname) {
             throw new APIError('Nickname cannot be empty', 400);
         }
 
-        await UserDB.update({ username }, { nickname: nickname.trim() });
+        // Update user's nickname
+        await UserDB.update({ userId }, { nickname: trimmedNickname });
+
+        // Update all chat messages from this user
+        await ChatDB.update(
+            { userId }, // Find all messages by this user
+            { nickname: trimmedNickname } // Update their nickname
+        );
+
         res.json({ success: true });
     } catch (error) {
         next(error);
     }
 });
+
 
 router.patch('/change-password', validateUsername, async (req, res, next) => {
     const timestamp = new Date().toISOString();
