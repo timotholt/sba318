@@ -5,9 +5,11 @@ import { router as userRoutes } from './routes/users.js';
 import { router as lobbyRoutes } from './routes/lobby.js';
 import { router as adminRoutes } from './routes/admin.js';
 import { router as chatRoutes } from './routes/chat.js';
+// import { router as systemRoutes } from './routes/system.js';
 import { db } from './database/database.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandling.js';
+import { SystemMessages } from './models/SystemMessages.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,7 +24,6 @@ const port = process.env.PORT || 3000;
 
 // Add this near the top of server.js, after creating the app
 app.set('trust proxy', true);
-
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -63,9 +64,16 @@ app.get('/about', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start the database
+// Graceful shutdown handler
+process.on('SIGTERM', async () => {
+    await SystemMessages.serverShutdown(5);
+    setTimeout(() => process.exit(0), 5000);
+});
+
+// Start the database and system user
 try {
     await db.connect();
+    await SystemMessages.initialize();
 } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

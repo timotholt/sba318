@@ -109,11 +109,6 @@ body::before {
   min-width: 800px;
 }
 
-#gameScreen {
-  max-width: 800px;
-  min-width: 800px;
-}
-
 .screen:hover {
     transform: translateY(-2px); */
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
