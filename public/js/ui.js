@@ -1,9 +1,21 @@
 export function showScreen(screens, screenName) {
+    clearAllErrors();
     Object.values(screens).forEach(screen => {
         screen.classList.add('hidden');
     });
     screens[screenName].classList.remove('hidden');
-    clearAllErrors();
+
+    // Set focus on the appropriate input field for each screen
+    const focusMap = {
+        login: 'username',
+        register: 'registerUsername',
+        lobby: 'gameName'
+    };
+
+    const inputToFocus = focusMap[screenName];
+    if (inputToFocus) {
+        document.getElementById(inputToFocus).focus();
+    }
 }
 
 // Get all error containers

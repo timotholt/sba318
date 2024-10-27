@@ -41,14 +41,22 @@ class GameApp {
         });
 
         document.getElementById('registerButton').addEventListener('click', () => this.handleRegister());
-        document.getElementById('registerUsername').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.handleRegister();
+        
+        // Register form Enter key handlers
+        ['registerUsername', 'registerPassword', 'confirmPassword'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.handleRegister();
+            });
         });
 
         // Login
         document.getElementById('loginButton').addEventListener('click', () => this.handleLogin());
-        document.getElementById('username').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.handleLogin();
+        
+        // Login form Enter key handlers
+        ['username', 'password'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.handleLogin();
+            });
         });
 
         // Logout
@@ -110,6 +118,8 @@ class GameApp {
             const response = await api.login(username, password);
             if (response?.success) {
                 window.globalUsername = username;
+                // Clear any errors on this page
+                clearAllErrors();
                 showScreen(this.screens, 'lobby');
                 this.startPolling();
             }
@@ -124,6 +134,8 @@ class GameApp {
                 const response = await api.logout(window.globalUsername);
                 if (response?.success) {
                     window.globalUsername = '';
+                    // Clear any errors on this page
+                    clearAllErrors();
                     this.stopPolling();
                     showScreen(this.screens, 'login');
                 }
@@ -145,9 +157,6 @@ class GameApp {
         try {
             const response = await api.createGame(gameName, window.globalUsername);
             if (response?.success) {
-                // Clear any errors on this page
-                clearAllErrors();
-              
                 gameNameInput.value = '';
                 this.updateGamesList();
             }
@@ -160,9 +169,6 @@ class GameApp {
         try {
             const response = await api.deleteGame(gameId, window.globalUsername);
             if (response?.success) {
-                // Clear any errors on this page
-                clearAllErrors();
-
                 this.updateGamesList();
             }
         } catch (error) {
