@@ -1,14 +1,33 @@
 export const api = {
-    async register(username, password) {
-        return this.sendRequest('/player/register', 'POST', { username, password });
+    async register(username, password, nickname) {
+        return this.sendRequest('/user/register', 'POST', { username, password, nickname });
     },
 
     async login(username, password) {
-        return this.sendRequest('/player/login', 'POST', { username, password });
+        return this.sendRequest('/user/login', 'POST', { username, password });
     },
 
     async logout(username) {
-        return this.sendRequest('/player/logout', 'POST', { username });
+        return this.sendRequest('/user/logout', 'POST', { username });
+    },
+
+    async changePassword(username, currentPassword, newPassword) {
+        return this.sendRequest('/user/change-password', 'POST', {
+            username,
+            currentPassword,
+            newPassword
+        });
+    },
+
+    async changeNickname(username, nickname) {
+        return this.sendRequest('/user/change-nickname', 'POST', {
+            username,
+            nickname
+        });
+    },
+
+    async deleteAccount(username) {
+        return this.sendRequest('/user/delete-account', 'POST', { username });
     },
 
     async getGames() {
@@ -28,7 +47,7 @@ export const api = {
     },
 
     async getMongoAdminUrl() {
-        return this.sendRequest('/player/admin-url', 'GET');
+        return this.sendRequest('/user/admin-url', 'GET');
     },
 
     async sendRequest(url, method = 'GET', data = null) {

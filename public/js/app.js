@@ -2,15 +2,22 @@ import { api } from './api.js';
 import { showScreen, showError, renderGamesList, clearAllErrors } from './ui.js';
 
 window.globalUsername = '';
+window.globalNickname = '';
 
 class GameApp {
     constructor() {
-        this.screens = {};
+        this.screens = {
+            login: document.getElementById('loginScreen'),
+            register: document.getElementById('registerScreen'),
+            lobby: document.getElementById('lobbyScreen'),
+            game: document.getElementById('gameScreen'),
+            settings: document.getElementById('settingsScreen')
+        };
+        
         this.pollInterval = null;
         this.refreshTimer = null;
         this.pollDelay = 30000; // 30 seconds
 
-        // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initialize());
         } else {
@@ -19,19 +26,11 @@ class GameApp {
     }
 
     initialize() {
-        this.screens = {
-            login: document.getElementById('loginScreen'),
-            register: document.getElementById('registerScreen'),
-            lobby: document.getElementById('lobbyScreen'),
-            game: document.getElementById('gameScreen')
-        };
-        
         this.setupEventListeners();
         showScreen(this.screens, 'login');
     }
 
     setupEventListeners() {
-        // Registration
         document.getElementById('showRegisterButton').addEventListener('click', () => {
             showScreen(this.screens, 'register');
         });
@@ -42,24 +41,20 @@ class GameApp {
 
         document.getElementById('registerButton').addEventListener('click', () => this.handleRegister());
         
-        // Register form Enter key handlers
-        ['registerUsername', 'registerPassword', 'confirmPassword'].forEach(id => {
+        ['registerUsername', 'registerNickname', 'registerPassword', 'confirmPassword'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') this.handleRegister();
             });
         });
 
-        // Login
         document.getElementById('loginButton').addEventListener('click', () => this.handleLogin());
         
-        // Login form Enter key handlers
         ['username', 'password'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') this.handleLogin();
             });
         });
 
-        // MongoDB Admin
         document.getElementById('adminLink').addEventListener('click', async (e) => {
             e.preventDefault();
             try {
@@ -72,16 +67,26 @@ class GameApp {
             }
         });
 
-        // Logout
         document.getElementById('logoutButton').addEventListener('click', () => this.handleLogout());
 
-        // Game creation
         document.getElementById('createGameButton').addEventListener('click', () => this.createGame());
         document.getElementById('gameName').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.createGame();
         });
 
-        // Back to lobby
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            document.getElementById('currentNickname').value = window.globalNickname;
+            showScreen(this.screens, 'settings');
+        });
+
+        document.getElementById('backToLobbyFromSettings').addEventListener('click', () => {
+            showScreen(this.screens, 'lobby');
+        });
+
+        document.getElementById('changeNicknameButton').addEventListener('click', () => this.handleChangeNickname());
+        document.getElementById('changePasswordButton').addEventListener('click', () => this.handleChangePassword());
+        document.getElementById('deleteAccountButton').addEventListener('click', () => this.handleDeleteAccount());
+
         document.getElementById('backToLobbyButton').addEventListener('click', () => {
             showScreen(this.screens, 'lobby');
         });
@@ -89,6 +94,7 @@ class GameApp {
 
     async handleRegister() {
         const username = document.getElementById('registerUsername').value.trim();
+        const nickname = document.getElementById('registerNickname').value.trim();
         const password = document.getElementById('registerPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         
@@ -103,14 +109,13 @@ class GameApp {
         }
 
         try {
-            const response = await api.register(username, password);
+            const response = await api.register(username, password, nickname);
             if (response?.success) {
-                showScreen(this.screens, 'login');
                 document.getElementById('registerUsername').value = '';
+                document.getElementById('registerNickname').value = '';
                 document.getElementById('registerPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
-            } else if (response?.message) {
-                showError(response.message, 'register');
+                showScreen(this.screens, 'login');
             }
         } catch (error) {
             const errorMessage = error.response?.message || 'Registration failed. Please try again.';
@@ -131,7 +136,7 @@ class GameApp {
             const response = await api.login(username, password);
             if (response?.success) {
                 window.globalUsername = username;
-                // Clear any errors on this page
+                window.globalNickname = response.nickname || username;
                 clearAllErrors();
                 showScreen(this.screens, 'lobby');
                 this.startPolling();
@@ -147,7 +152,7 @@ class GameApp {
                 const response = await api.logout(window.globalUsername);
                 if (response?.success) {
                     window.globalUsername = '';
-                    // Clear any errors on this page
+                    window.globalNickname = '';
                     clearAllErrors();
                     this.stopPolling();
                     showScreen(this.screens, 'login');
@@ -155,6 +160,71 @@ class GameApp {
             }
         } catch (error) {
             showError('Logout failed. Please try again.', 'lobby');
+        }
+    }
+
+    async handleChangeNickname() {
+        const nickname = document.getElementById('currentNickname').value.trim();
+        
+        if (!nickname) {
+            showError('Please enter a nickname', 'settings');
+            return;
+        }
+
+        try {
+            const response = await api.changeNickname(window.globalUsername, nickname);
+            if (response?.success) {
+                window.globalNickname = nickname;
+                showError('Nickname updated successfully!', 'settings');
+            }
+        } catch (error) {
+            showError(error.response?.message || 'Failed to update nickname', 'settings');
+        }
+    }
+
+    async handleChangePassword() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            showError('All fields are required', 'settings');
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            showError('New passwords do not match', 'settings');
+            return;
+        }
+
+        try {
+            const response = await api.changePassword(window.globalUsername, currentPassword, newPassword);
+            if (response?.success) {
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmNewPassword').value = '';
+                showError('Password changed successfully!', 'settings');
+            }
+        } catch (error) {
+            showError(error.response?.message || 'Failed to change password', 'settings');
+        }
+    }
+
+    async handleDeleteAccount() {
+        if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await api.deleteAccount(window.globalUsername);
+            if (response?.success) {
+                window.globalUsername = '';
+                window.globalNickname = '';
+                this.stopPolling();
+                showScreen(this.screens, 'login');
+            }
+        } catch (error) {
+            showError('Failed to delete account', 'settings');
         }
     }
     
@@ -249,5 +319,4 @@ class GameApp {
     }
 }
 
-// Initialize the app
 new GameApp();

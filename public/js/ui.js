@@ -5,11 +5,11 @@ export function showScreen(screens, screenName) {
     });
     screens[screenName].classList.remove('hidden');
 
-    // Set focus on the appropriate input field for each screen
     const focusMap = {
         login: 'username',
         register: 'registerUsername',
-        lobby: 'gameName'
+        lobby: 'gameName',
+        settings: 'currentNickname'
     };
 
     const inputToFocus = focusMap[screenName];
@@ -18,12 +18,12 @@ export function showScreen(screens, screenName) {
     }
 }
 
-// Get all error containers
 const errorContainers = {
     login: document.getElementById('loginError'),
     register: document.getElementById('registerError'),
     lobby: document.getElementById('lobbyError'),
-    game: document.getElementById(`gameError`)
+    game: document.getElementById('gameError'),
+    settings: document.getElementById('settingsError')
 };
 
 export function clearAllErrors() {
@@ -38,9 +38,10 @@ export function showError(message, screenName = 'login') {
         errorDiv.textContent = message;
         errorDiv.style.display = message ? 'block' : 'none';
         
-        // Hide the error after 3 seconds
         setTimeout(() => {
-//            errorDiv.style.display = 'none';
+            if (message.includes('successfully')) {
+                errorDiv.style.display = 'none';
+            }
         }, 3000);
     }
 }
@@ -56,7 +57,7 @@ export function renderGamesList(games, onDelete, onJoin) {
         gameElement.className = 'game-item';
         
         const gameInfo = document.createElement('div');
-        gameInfo.textContent = `${game.name} (Created by: ${game.creator})`;
+        gameInfo.textContent = `${game.name} (Created by: ${game.creatorNickname})`;
         
         const buttonsDiv = document.createElement('div');
         buttonsDiv.className = 'game-buttons';

@@ -48,6 +48,41 @@ button:hover {
     align-items: center;
 }
 
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    padding: 4px;
+    width: auto;
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    background: #f0f0f0;
+    border-radius: 50%;
+}
+
+.back-btn {
+    background: #666;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px 16px;
+    margin: 0;
+    width: auto;
+}
+
+.back-btn:hover {
+    background: #555;
+}
+
 .logout-btn {
     background: #ff4444;
     color: white;

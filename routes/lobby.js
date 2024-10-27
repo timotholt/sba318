@@ -1,19 +1,26 @@
 import express from 'express';
 import { games } from '../models/gameState.js';
+import { UserDB } from '../models/User.js';
 
 const router = express.Router();
 
 // Get all games
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] GET / - Fetching all games`);
 
     try {
+        // Fetch all games and add creator nicknames
+        const gamesWithNicknames = await Promise.all(games.map(async game => {
+            const creator = await UserDB.findOne({ username: game.creator });
+            return {
+                ...game,
+                creatorNickname: creator?.nickname || game.creator
+            };
+        }));
+
         console.log(`[${timestamp}] Total games: ${games.length}`);
-        games.forEach((game, index) => {
-            console.log(`[${timestamp}] Game ${index + 1}:`, game);
-        });
-        res.json(games);
+        res.json(gamesWithNicknames);
     } catch (error) {
         console.error(`[${timestamp}] Error fetching games:`, error);
         res.status(500).json({
@@ -24,7 +31,7 @@ router.get('/', (req, res) => {
 });
 
 // Create a new game
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST / - Parameters:`, {
         name: req.body.name,
@@ -42,14 +49,8 @@ router.post('/', (req, res) => {
             });
         }
 
-        // Check if a game with the same name already exists
         const existingGame = games.find(game => game.name.toLowerCase() === name.toLowerCase());
-
-
-    console.log(`existingGame = ${existingGame}`);
-      console.log(games);
-      console.log(`newgame name = ${name.toLowerCase()}`);
-      
+        
         if (existingGame) {
             console.log(`[${timestamp}] Game creation failed: Game name "${name}" already exists`);
             return res.status(400).json({
@@ -58,10 +59,12 @@ router.post('/', (req, res) => {
             });
         }
 
+        const creatorUser = await UserDB.findOne({ username: creator });
         const newGame = {
             id: Date.now().toString(),
             name,
             creator,
+            creatorNickname: creatorUser?.nickname || creator,
             players: [creator],
             created: new Date().toISOString()
         };

@@ -26,6 +26,7 @@
             <h2>Register</h2>
             <div class="form-group">
                 <input type="text" id="registerUsername" placeholder="Choose username">
+                <input type="text" id="registerNickname" placeholder="Choose nickname (optional)">
                 <input type="password" id="registerPassword" placeholder="Choose password">
                 <input type="password" id="confirmPassword" placeholder="Confirm password">
                 <button id="registerButton">Register</button>
@@ -39,7 +40,10 @@
         <div id="lobbyScreen" class="screen hidden">
             <div class="header">
                 <h2>Game Lobby</h2>
-                <button id="logoutButton" class="logout-btn">Logout</button>
+                <div class="header-buttons">
+                    <button id="settingsButton" class="icon-btn">⚙️</button>
+                    <button id="logoutButton" class="logout-btn">Logout</button>
+                </div>
             </div>
             <div class="form-group">
                 <input type="text" id="gameName" placeholder="Enter game name">
@@ -48,6 +52,30 @@
             </div>
             <div id="gamesList"></div>
             <div id="refreshTimer" class="refresh-timer"></div>
+        </div>
+
+        <div id="settingsScreen" class="screen hidden">
+            <div class="header">
+                <h2>Settings</h2>
+                <button id="backToLobbyFromSettings" class="back-btn">← Back</button>
+            </div>
+            <div class="form-group">
+                <h3>Profile Settings</h3>
+                <input type="text" id="currentNickname" placeholder="Enter new nickname">
+                <button id="changeNicknameButton">Update Nickname</button>
+            </div>
+            <div class="form-group">
+                <h3>Change Password</h3>
+                <input type="password" id="currentPassword" placeholder="Current Password">
+                <input type="password" id="newPassword" placeholder="New Password">
+                <input type="password" id="confirmNewPassword" placeholder="Confirm New Password">
+                <button id="changePasswordButton">Change Password</button>
+                <div id="settingsError" class="error">SETTINGS ERRORS GO HERE</div>
+            </div>
+            <div class="form-group">
+                <h3>Danger Zone</h3>
+                <button id="deleteAccountButton" class="delete-btn">Delete Account</button>
+            </div>
         </div>
 
         <div id="gameScreen" class="screen hidden">

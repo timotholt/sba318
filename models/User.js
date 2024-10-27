@@ -11,9 +11,20 @@ const userSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 30
   },
+  nickname: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    maxlength: 30,
+    default: function() {
+      return this.username;
+    }
+  },
   password: {
     type: String,
     required: true,
+    trim: true,
     minlength: 6
   },
   createdAt: {
@@ -33,7 +44,6 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 export const User = mongoose.model('User', userSchema);
 
-// Database operations wrapper
 const db = getDbAdapter(process.env.DB_TYPE || 'memory');
 
 export const UserDB = {
