@@ -1,19 +1,24 @@
 import express from 'express';
-import morgan from 'morgan';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { router as userRoutes } from './routes/users.js';
 import { router as lobbyRoutes } from './routes/lobby.js';
 import { db } from './database/database.js';
-import dotenv from 'dotenv';
+import { requestLogger } from './middleware/requestLogger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandling.js';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Enable CORS
+// Request processing middleware
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Security middleware
+app.use(mongoSanitize());
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
@@ -21,42 +26,26 @@ app.use(function (req, res, next) {
     next();
 });
 
-// Add Morgan middleware for logging
-app.use(morgan('dev'));
+// Custom middleware
+app.use(requestLogger);
 
-// Security middleware
-app.use(mongoSanitize());
-
-// Middleware for parsing JSON bodies
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from client directory
+// Static files
 app.use(express.static('public'));
 
-// API Routes
+// Routes
 app.use('/user', userRoutes);
 app.use('/lobby', lobbyRoutes);
 
-// Root route handler
+// Root route
 app.get('/about', (req, res) => {
     res.json({ message: 'Hello World!' });
 });
 
-// Error handling middleware
+// Error handling middleware (must be last)
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        message: 'An error occurred on the server'
-    });
-});
-
-// Start the database, exit if we can't start it
+// Start the database
 try {
     await db.connect();
 } catch (error) {
@@ -64,12 +53,10 @@ try {
     process.exit(1);
 }
 
-// Start listening for reqeusts!
+// Start the server
 import { buildInfo } from './buildInfo.js';
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-
-// Add to your UI somewhere:
     console.log(`Game Server Version: ${buildInfo.version} (Built: ${buildInfo.buildDate})`);
 });
