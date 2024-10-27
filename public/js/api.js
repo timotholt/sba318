@@ -12,7 +12,7 @@ export const api = {
     },
 
     async changePassword(username, currentPassword, newPassword) {
-        return this.sendRequest('/user/change-password', 'POST', {
+        return this.sendRequest('/user/change-password', 'PATCH', {
             username,
             currentPassword,
             newPassword
@@ -20,7 +20,7 @@ export const api = {
     },
 
     async changeNickname(username, nickname) {
-        return this.sendRequest('/user/change-nickname', 'POST', {
+        return this.sendRequest('/user/change-nickname', 'PATCH', {
             username,
             nickname
         });

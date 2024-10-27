@@ -135,4 +135,54 @@ router.post('/logout', validateUsername, async (req, res) => {
     }
 });
 
+router.patch('/change-nickname', validateUsername, async (req, res) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PATCH /change-nickname - Username: ${req.body.username}`);
+
+    try {
+        const { username, nickname } = req.body;
+        if (!nickname || nickname.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Nickname cannot be empty'
+            });
+        }
+
+        await UserDB.update({ username }, { nickname: nickname.trim() });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(`[${timestamp}] Change nickname error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to change nickname'
+        });
+    }
+});
+
+router.patch('/change-password', validateUsername, async (req, res) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] PATCH /change-password - Username: ${req.body.username}`);
+
+    try {
+        const { username, currentPassword, newPassword } = req.body;
+        const user = await UserDB.findOne({ username });
+
+        if (!user || user.password !== currentPassword) {
+            return res.status(401).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
+        }
+
+        await UserDB.update({ username }, { password: newPassword });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(`[${timestamp}] Change password error:`, error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to change password'
+        });
+    }
+});
+
 export { router };

@@ -1,19 +1,20 @@
 # Game Lobby Application
 
-A real-time game lobby system built with Node.js, Express, and MongoDB.
+A real-time game lobby system built with Node.js, Express, and a modular database system supporting both in-memory and MongoDB storage.
 
 ## Features
 
 - User authentication (register/login)
 - Real-time game lobby
-- Create and join games
-- MongoDB integration
+- Create and join games with player limits
+- Nickname support for all players
+- Modular database system (in-memory or MongoDB)
 - Security features
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- MongoDB Atlas account
+- MongoDB Atlas account (optional - only if using MongoDB)
 - Modern web browser
 
 ## Setup
@@ -25,8 +26,10 @@ A real-time game lobby system built with Node.js, Express, and MongoDB.
    ```
 3. Configure environment:
    - Copy `.env.example` to `.env`
-   - Update MongoDB connection string
+   - Choose database type (memory or mongodb)
+   - If using MongoDB, update connection string
    ```
+   DB_TYPE=memory        # Use 'mongodb' for MongoDB
    MONGODB_URI=your_mongodb_connection_string
    MONGO_ADMIN_URL=your_mongodb_admin_url
    ```
@@ -42,34 +45,37 @@ Server will start on port 3000 (or PORT from environment variables)
 ## Project Structure
 
 ```
-├── config/
-│   └── database.js     # MongoDB configuration
+├── database/
+│   ├── BaseDbEngine.js     # Base database engine interface
+│   ├── InMemoryDbEngine.js # In-memory database implementation
+│   ├── MongoDbEngine.js    # MongoDB database implementation
+│   ├── database.js         # Database connection manager
+│   └── selectDbEngine.js   # Database engine factory
 ├── middleware/
-│   └── validation.js   # Request validation
+│   └── validation.js       # Request validation
 ├── models/
-│   ├── User.js         # User model
-│   └── gameState.js    # Game state management
+│   ├── User.js            # User model
+│   └── GameState.js       # Game state model
 ├── public/
 │   ├── js/
-│   │   ├── api.js      # API client
-│   │   ├── app.js      # Main application logic
-│   │   └── ui.js       # UI management
-│   ├── index.html      # Main HTML
-│   └── styles.css      # Styles
+│   │   ├── api.js         # API client
+│   │   ├── app.js         # Main application logic
+│   │   └── ui.js          # UI management
+│   ├── index.html         # Main HTML
+│   └── styles.css         # Styles
 ├── routes/
-│   ├── lobby.js        # Game lobby routes
-│   └── players.js      # User routes
-└── server.js           # Express server setup
+│   ├── lobby.js           # Game lobby routes
+│   └── users.js          # User routes
+└── server.js              # Express server setup
 ```
 
-## Security Features
+## Game Features
 
-- Password hashing (bcrypt)
-- Rate limiting
-- MongoDB query sanitization
-- Request size limiting
-- Input validation
-- Secure password storage
+- Create games with customizable player limits (1-4 players)
+- Join/leave games
+- Real-time player list updates
+- Nickname display for all players
+- Game creator controls
 
 ## API Documentation
 
@@ -77,16 +83,17 @@ Server will start on port 3000 (or PORT from environment variables)
 
 #### Register User
 ```
-POST /player/register
+POST /user/register
 {
   "username": "string",
-  "password": "string"
+  "password": "string",
+  "nickname": "string" (optional)
 }
 ```
 
 #### Login
 ```
-POST /player/login
+POST /user/login
 {
   "username": "string",
   "password": "string"
@@ -105,7 +112,8 @@ GET /lobby
 POST /lobby
 {
   "name": "string",
-  "creator": "string"
+  "creator": "string",
+  "maxPlayers": number (1-4)
 }
 ```
 
@@ -116,6 +124,33 @@ POST /lobby/:id/join
   "username": "string"
 }
 ```
+
+#### Leave Game
+```
+POST /lobby/:id/leave
+{
+  "username": "string"
+}
+```
+
+#### Delete Game
+```
+DELETE /lobby/:id?username=string
+```
+
+## Database System
+
+The application uses a modular database system that supports:
+- In-memory storage (development)
+- MongoDB (production)
+- Extensible for other database types
+
+To add a new database engine:
+1. Create new engine file in `database/`
+2. Extend `BaseDbEngine`
+3. Implement required methods
+4. Add to `selectDbEngine.js`
+5. Update DB_TYPE in `.env`
 
 ## Contributing
 
