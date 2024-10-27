@@ -52,6 +52,18 @@
         <div class="data-tables">
             <section class="games-section">
                 <h2>Active Games</h2>
+                <form class="filter-form" action="/admin/dashboard" method="GET">
+                  <label>Filter by minimum players:
+                  <select name="minPlayers">
+                    <option value="">All</option>
+                    <option value="1" <%= minPlayers === '1' ? 'selected' : '' %>>1+</option>
+                    <option value="2" <%= minPlayers === '2' ? 'selected' : '' %>>2+</option>
+                    <option value="3" <%= minPlayers === '3' ? 'selected' : '' %>>3+</option>
+                    <option value="4" <%= minPlayers === '4' ? 'selected' : '' %>>4</option>
+                  </select>
+                  </label>
+                  <button type="submit">Filter</button>
+                </form>
                 <table>
                     <thead>
                         <tr>

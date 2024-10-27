@@ -34,12 +34,20 @@ function calculateStats(games, users) {
 // Main dashboard view
 router.get('/dashboard', async (req, res, next) => {
     try {
+        const minPlayers = req.query.minPlayers;
         const games = await GameStateDB.findAll();
         const users = await UserDB.findAll();
         const stats = calculateStats(games, users);
 
-        // Sort games by player count and creation date
-        const sortedGames = [...games].sort((a, b) => {
+        // Filter and sort games
+        let filteredGames = [...games];
+        if (minPlayers) {
+            filteredGames = filteredGames.filter(game => 
+                game.players.length >= parseInt(minPlayers)
+            );
+        }
+
+        const sortedGames = filteredGames.sort((a, b) => {
             if (b.players.length !== a.players.length) {
                 return b.players.length - a.players.length;
             }
@@ -50,7 +58,8 @@ router.get('/dashboard', async (req, res, next) => {
             stats, 
             games: sortedGames,
             users,
-            moment: new Date() // For date formatting
+            moment: new Date(),
+            minPlayers: minPlayers || ''
         });
     } catch (error) {
         next(error);
