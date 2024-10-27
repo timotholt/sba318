@@ -1,5 +1,3 @@
-console.log(`before import`)
-
 import { validation } from '../utils/validation.js';
 
 // Username validation middleware

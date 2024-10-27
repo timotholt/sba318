@@ -97,7 +97,8 @@ export const UserDB = {
       { userId }, 
       { 
         deleted: true,
-        deletedAt: new Date()
+        deletedAt: new Date(),
+        nickname: "Deleted User"
       }
     );
   },

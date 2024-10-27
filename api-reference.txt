@@ -12,9 +12,9 @@ Authentication Endpoints
    Description: Creates a new user account
    Request Body:
    {
-     "username": "string",     // Required, 3-30 chars
-     "password": "string",     // Required, min 6 chars
-     "nickname": "string"      // Optional, defaults to username
+     "username": "string",     // Required, 3-30 chars, lowercase letters and numbers only
+     "password": "string",     // Required, min 8 chars, must contain uppercase, lowercase, number, symbol
+     "nickname": "string"      // Optional, 1-30 chars, defaults to username
    }
    Response: 
    {
@@ -24,6 +24,8 @@ Authentication Endpoints
    Errors:
    - 400: Username and password are required
    - 400: Username already exists
+   - 400: Invalid username format
+   - 400: Invalid password format
    - 500: Registration failed
 
 2. Login
@@ -37,10 +39,13 @@ Authentication Endpoints
    Response:
    {
      "success": true,
-     "nickname": "string"     // User's current nickname
+     "nickname": "string",    // User's current nickname
+     "userId": "string"       // UUID v4 format
    }
    Errors:
    - 401: Invalid username or password
+   - 400: Invalid username format
+   - 400: Invalid password format
    - 500: Login failed
 
 3. Logout
@@ -48,14 +53,14 @@ Authentication Endpoints
    Description: Logs out user and removes them from any games
    Request Body:
    {
-     "username": "string"
+     "userId": "string"      // UUID v4
    }
    Response:
    {
      "success": true
    }
    Errors:
-   - 400: Valid username is required
+   - 400: Valid userId is required
    - 500: Logout failed
 
 Profile Management Endpoints
@@ -66,8 +71,8 @@ Profile Management Endpoints
    Description: Updates user's display name
    Request Body:
    {
-     "username": "string",
-     "nickname": "string"     // 1-30 chars
+     "userId": "string",     // UUID v4
+     "nickname": "string"    // 1-30 chars
    }
    Response:
    {
@@ -75,6 +80,8 @@ Profile Management Endpoints
    }
    Errors:
    - 400: Nickname cannot be empty
+   - 400: Invalid nickname format
+   - 404: User not found
    - 500: Failed to change nickname
 
 2. Change Password
@@ -82,9 +89,9 @@ Profile Management Endpoints
    Description: Updates user's password
    Request Body:
    {
-     "username": "string",
+     "userId": "string",          // UUID v4
      "currentPassword": "string",
-     "newPassword": "string"  // Min 6 chars
+     "newPassword": "string"      // Must meet password requirements
    }
    Response:
    {
@@ -92,13 +99,15 @@ Profile Management Endpoints
    }
    Errors:
    - 401: Current password is incorrect
+   - 400: Invalid password format
+   - 404: User not found
    - 500: Failed to change password
 
 3. Delete Account
-   Endpoint: DELETE /user/:username
-   Description: Permanently deletes user account and removes from all games
+   Endpoint: DELETE /user/:userId
+   Description: Soft deletes user account and updates related records
    URL Parameters:
-   - username: User to delete
+   - userId: UUID v4 of user to delete
    Response:
    {
      "success": true
@@ -113,19 +122,22 @@ Game Lobby Endpoints
 
 1. Get All Games
    Endpoint: GET /lobby
-   Description: Retrieves list of all active games with player nicknames
+   Description: Retrieves list of all active games with player info
    Query Parameters:
-   - username: Optional. If provided, returns only games where user is creator or player
+   - userId: Optional UUID v4. If provided, returns only games where user is creator or player
    Response:
    [
      {
        "id": "string",        // UUID v4
        "name": "string",
-       "creator": "string",   // Username of creator
-       "creatorNickname": "string",
+       "creator": "string",   // Creator's UUID
        "maxPlayers": number,  // 1-4
-       "players": ["string"], // Array of usernames
-       "playerNicknames": ["string"], // Array of player nicknames
+       "players": [           // Array of player objects
+         {
+           "userId": "string",
+           "nickname": "string"
+         }
+       ],
        "created": "date"      // ISO 8601
      }
    ]
@@ -138,7 +150,7 @@ Game Lobby Endpoints
    Request Body:
    {
      "name": "string",
-     "creator": "string",
+     "creator": "string",    // Creator's UUID
      "maxPlayers": number    // Optional, 1-4, defaults to 4
    }
    Response:
@@ -162,7 +174,7 @@ Game Lobby Endpoints
    - id: Game ID (UUID)
    Request Body:
    {
-     "username": "string"
+     "userId": "string"      // UUID v4
    }
    Response:
    {
@@ -184,7 +196,7 @@ Game Lobby Endpoints
    - id: Game ID (UUID)
    Request Body:
    {
-     "username": "string"
+     "userId": "string"      // UUID v4
    }
    Response:
    {
@@ -204,16 +216,84 @@ Game Lobby Endpoints
    URL Parameters:
    - id: Game ID (UUID)
    Query Parameters:
-   - username: Creator's username
+   - userId: Creator's UUID
    Response:
    {
      "success": true
    }
    Errors:
-   - 400: Username is required
+   - 400: UserId is required
    - 404: Game not found
    - 403: Only the creator can delete the game
    - 500: Failed to delete game
+
+Chat Endpoints
+------------
+
+1. Get Messages
+   Endpoint: GET /chat
+   Description: Retrieves chat messages
+   Query Parameters:
+   - type: Required ('lobby' or 'game')
+   - gameId: Required for game chat (UUID)
+   Response:
+   [
+     {
+       "type": "string",     // 'lobby' or 'game'
+       "gameId": "string",   // Only for game chat
+       "userId": "string",   // UUID v4
+       "nickname": "string", // Current or last known nickname
+       "message": "string",
+       "timestamp": "date",  // ISO 8601
+       "deleted": boolean    // True if user was deleted
+     }
+   ]
+   Errors:
+   - 400: Valid chat type required
+   - 404: Game not found (for game chat)
+   - 500: Failed to retrieve messages
+
+2. Send Message
+   Endpoint: POST /chat
+   Description: Sends a new chat message
+   Request Body:
+   {
+     "type": "string",      // 'lobby' or 'game'
+     "gameId": "string",    // Required for game chat
+     "userId": "string",    // UUID v4
+     "message": "string"    // Max 500 chars
+   }
+   Response:
+   {
+     "success": true,
+     "message": {
+       // Full message object
+     }
+   }
+   Errors:
+   - 400: Invalid message type
+   - 400: Message too long
+   - 404: User not found
+   - 404: Game not found (for game chat)
+   - 403: User not in game (for game chat)
+   - 500: Failed to send message
+
+3. Delete Game Chat
+   Endpoint: DELETE /chat/game/:gameId
+   Description: Deletes all chat messages for a game (creator only)
+   URL Parameters:
+   - gameId: Game ID (UUID)
+   Query Parameters:
+   - userId: Creator's UUID
+   Response:
+   {
+     "success": true,
+     "message": "Chat history deleted"
+   }
+   Errors:
+   - 404: Game not found
+   - 403: Only game creator can delete chat history
+   - 500: Failed to delete chat history
 
 Administrative Endpoints
 ----------------------
@@ -248,17 +328,17 @@ Notes
 -----
 1. All endpoints require Content-Type: application/json header
 2. Dates are returned in ISO 8601 format
-3. Game IDs are UUIDs generated using crypto.randomUUID()
-4. Nicknames are used for display purposes in the game lobby
+3. All IDs (userId, gameId) are UUID v4 format
+4. Nicknames are used for display purposes
 5. The server supports both in-memory and MongoDB storage
 6. Real-time updates require polling the /lobby endpoint
 7. Maximum players per game is configurable from 1-4
-8. Player lists maintain both usernames and nicknames
+8. Deleted users are marked as deleted but retained for reference
 9. Database type is configured via DB_TYPE environment variable
 10. Password changes require current password verification
-11. Account deletion removes user from all active games
+11. Account deletion is a soft delete
 12. Game creator cannot be removed from their own game
-13. Account deletion is prevented if user has active games with players
+13. Chat messages retain original sender info even if user is deleted
 
 Security Features
 ---------------
@@ -267,11 +347,13 @@ Security Features
 3. CORS enabled for all origins
 4. Password fields redacted in logs
 5. Stack traces only shown in development
-6. Validation middleware for username
+6. Validation middleware for all inputs
 7. Custom error handling middleware
 8. Request logging with sanitized data
 9. Response time tracking
 10. IP address logging
+11. UUID-based identification
+12. Soft delete for user accounts
 
 Environment Variables
 -------------------
@@ -302,12 +384,12 @@ Middleware Stack
 3. MongoDB Sanitizer
 4. CORS Handler
 5. Request Logger
-6. Username Validator
+6. Input Validation
 7. Error Handlers (404, Global)
 
 Client Integration
 ----------------
-1. Regular polling recommended (30s)
+1. Regular polling recommended (30s for games, 1s for chat)
 2. Handle all error responses
 3. Implement exponential backoff
 4. Validate all inputs

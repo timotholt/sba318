@@ -20,6 +20,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Add this near the top of server.js, after creating the app
+app.set('trust proxy', true);
+
+
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

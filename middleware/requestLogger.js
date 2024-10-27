@@ -6,9 +6,14 @@ export function requestLogger(req, res, next) {
     const {
         method,
         originalUrl,
-        ip,
         headers,
     } = req;
+
+    // Get IP address from various possible sources
+    const ip = req.ip || 
+               req.connection.remoteAddress || 
+               req.headers['x-forwarded-for']?.split(',')[0] || 
+               'unknown';
 
     // Format query parameters
     const queryParams = Object.keys(req.query).length 
@@ -22,12 +27,20 @@ export function requestLogger(req, res, next) {
     // if (sanitizedBody.newPassword) sanitizedBody.newPassword = '[REDACTED]';
     
     // Log the request
+    // console.log(`[${timestamp}] ${method} ${originalUrl}
+    // IP: ${ip}
+    // Query params: ${queryParams}
+    // Body: ${JSON.stringify(sanitizedBody)}
+    // User-Agent: ${headers['user-agent'] || 'none'}
+    // `);
+
+    // Log the request
     console.log(`[${timestamp}] ${method} ${originalUrl}
-    IP: ${ip}
     Query params: ${queryParams}
     Body: ${JSON.stringify(sanitizedBody)}
     User-Agent: ${headers['user-agent'] || 'none'}
     `);
+
 
     // Track response time
     const startTime = process.hrtime();
@@ -41,8 +54,10 @@ export function requestLogger(req, res, next) {
 
         console.log(`[${timestamp}] Response sent: Status ${res.statusCode}, Time: ${responseTime}ms`);
 
-      originalEnd.call(this, chunk, encoding);
+        originalEnd.call(this, chunk, encoding);
     };
 
     next();
 }
+
+
