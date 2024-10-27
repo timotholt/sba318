@@ -69,7 +69,20 @@ router.get('/dashboard/events', (req, res) => {
             const users = await UserDB.findAll();
             const stats = calculateStats(games, users);
             
-            res.write(`data: ${JSON.stringify({ stats, timestamp: new Date() })}\n\n`);
+            // Sort games like in the dashboard route
+            const sortedGames = [...games].sort((a, b) => {
+                if (b.players.length !== a.players.length) {
+                    return b.players.length - a.players.length;
+                }
+                return new Date(b.created) - new Date(a.created);
+            });
+
+            res.write(`data: ${JSON.stringify({
+                stats,
+                games: sortedGames,
+                users: users.slice(-10), // Last 10 users
+                timestamp: new Date()
+            })}\n\n`);
         } catch (error) {
             console.error('Error sending SSE update:', error);
         }

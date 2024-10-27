@@ -5,6 +5,8 @@ const evtSource = new EventSource('/admin/dashboard/events');
 evtSource.onmessage = function(event) {
     const data = JSON.parse(event.data);
     updateDashboard(data.stats);
+    updateGamesTable(data.games);
+    updateUsersTable(data.users);
     updateLastUpdated(data.timestamp);
 };
 
@@ -33,6 +35,29 @@ function updateDashboard(stats) {
     } else {
         creatorElement.textContent = 'None';
     }
+}
+
+function updateGamesTable(games) {
+    const tbody = document.querySelector('.games-section tbody');
+    tbody.innerHTML = games.map(game => `
+        <tr>
+            <td>${game.name}</td>
+            <td>${game.creatorNickname}</td>
+            <td>${game.players.length}/${game.maxPlayers}</td>
+            <td>${new Date(game.created).toLocaleString()}</td>
+        </tr>
+    `).join('');
+}
+
+function updateUsersTable(users) {
+    const tbody = document.querySelector('.users-section tbody');
+    tbody.innerHTML = users.map(user => `
+        <tr>
+            <td>${user.username}</td>
+            <td>${user.nickname}</td>
+            <td>${new Date(user.createdAt).toLocaleString()}</td>
+        </tr>
+    `).join('');
 }
 
 // Update last updated timestamp
