@@ -8,17 +8,13 @@
 </head>
 <body>
     <div id="app">
-        <!-- Add hidden input for userId storage -->
-        <input type="hidden" id="globalUserId">
-        
-        <!-- Login screen remains mostly the same -->
         <div id="loginScreen" class="screen">
             <h2>Login</h2>
             <div class="form-group">
                 <input type="text" id="username" placeholder="Enter username">
                 <input type="password" id="password" placeholder="Enter password">
                 <button id="loginButton">Login</button>
-                <div id="loginError" class="error"></div>
+                <div id="loginError" class="error">LOGIN ERRORS GO HERE</div>
             </div>
             <div class="form-group">
                 <p>Don't have an account? <button id="showRegisterButton">Register</button></p>
@@ -27,7 +23,6 @@
             </div>
         </div>
 
-        <!-- Register screen remains the same -->
         <div id="registerScreen" class="screen hidden">
             <h2>Register</h2>
             <div class="form-group">
@@ -36,45 +31,45 @@
                 <input type="password" id="registerPassword" placeholder="Choose password">
                 <input type="password" id="confirmPassword" placeholder="Confirm password">
                 <button id="registerButton">Register</button>
-                <div id="registerError" class="error"></div>
+                <div id="registerError" class="error">REGISTER ERRORS GO HERE</div>
             </div>
             <div class="form-group">
                 <p>Already have an account? <button id="showLoginButton">Login</button></p>
             </div>
         </div>
 
-        <!-- Lobby screen - update data attributes -->
         <div id="lobbyScreen" class="screen hidden">
             <div class="header">
                 <h2>Game Lobby</h2>
                 <div class="header-buttons">
-                    <button id="settingsButton" class="icon-btn" data-userid="">⚙️</button>
-                    <button id="logoutButton" class="logout-btn" data-userid="">Logout</button>
+                    <button id="settingsButton" class="icon-btn">⚙️</button>
+                    <button id="logoutButton" class="logout-btn">Logout</button>
                 </div>
             </div>
             <div class="form-group">
                 <input type="text" id="gameName" placeholder="Enter game name">
-                <button id="createGameButton" data-userid="">Create Game</button>
-                <div id="lobbyError" class="error"></div>
+                <button id="createGameButton">Create Game</button>
+                <div id="lobbyError" class="error">LOBBY ERRORS GO HERE</div>
             </div>
             <div class="filter-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="showMyGamesOnly" data-userid="">
+                    <input type="checkbox" id="showMyGamesOnly">
                     Only show my games
                 </label>
             </div>
-            <div id="gamesList" data-userid=""></div>
+            <div id="gamesList"></div>
             <div id="refreshTimer" class="refresh-timer"></div>
-            <div id="lobbyChatContainer" class="chat-container">
-                <div id="lobbyChatMessages" class="chat-messages" data-userid=""></div>
-                <div class="chat-input">
-                    <input type="text" id="lobbyChatInput" placeholder="Type a message..." data-userid="">
-                    <button id="sendLobbyChatMessage" data-userid="">Send</button>
-                </div>
-            </div>
+            <!-- Add inside #gameScreen div in public/index.html -->
+    <!-- ... other lobby content ... -->
+    <div id="lobbyChatContainer" class="chat-container">
+        <div id="lobbyChatMessages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="lobbyChatInput" placeholder="Type a message...">
+            <button id="sendLobbyChatMessage">Send</button>
+        </div>
+    </div>
         </div>
 
-        <!-- Settings screen - update data attributes -->
         <div id="settingsScreen" class="screen hidden">
             <div class="header">
                 <h2>Settings</h2>
@@ -82,36 +77,36 @@
             </div>
             <div class="form-group">
                 <h3>Profile Settings</h3>
-                <input type="text" id="currentNickname" placeholder="Enter new nickname" data-userid="">
-                <button id="changeNicknameButton" data-userid="">Update Nickname</button>
+                <input type="text" id="currentNickname" placeholder="Enter new nickname">
+                <button id="changeNicknameButton">Update Nickname</button>
             </div>
             <div class="form-group">
                 <h3>Change Password</h3>
                 <input type="password" id="currentPassword" placeholder="Current Password">
                 <input type="password" id="newPassword" placeholder="New Password">
                 <input type="password" id="confirmNewPassword" placeholder="Confirm New Password">
-                <button id="changePasswordButton" data-userid="">Change Password</button>
-                <div id="settingsError" class="error"></div>
+                <button id="changePasswordButton">Change Password</button>
+                <div id="settingsError" class="error">SETTINGS ERRORS GO HERE</div>
             </div>
             <div class="form-group">
                 <h3>Danger Zone</h3>
-                <button id="deleteAccountButton" class="delete-btn" data-userid="">Delete Account</button>
+                <button id="deleteAccountButton" class="delete-btn">Delete Account</button>
             </div>
         </div>
 
-        <!-- Game screen - update data attributes -->
         <div id="gameScreen" class="screen hidden">
             <h2>Game</h2>
-            <div id="gameContent" data-userid=""></div>
-            <button id="backToLobbyButton" data-userid="">Back to Lobby</button>
+            <div id="gameContent"></div>
+            <button id="backToLobbyButton">Back to Lobby</button>
+            <!-- ... other game content ... -->
             <div id="gameChatContainer" class="chat-container">
-                <div id="gameChatMessages" class="chat-messages" data-userid=""></div>
+                <div id="gameChatMessages" class="chat-messages"></div>
                 <div class="chat-input">
-                    <input type="text" id="gameChatInput" placeholder="Type a message..." data-userid="">
-                    <button id="sendGameChatMessage" data-userid="">Send</button>
+                    <input type="text" id="gameChatInput" placeholder="Type a message...">
+                    <button id="sendGameChatMessage">Send</button>
                 </div>
             </div>
-            <div id="gameError" class="error"></div>
+            <div id="gameError" class="error">GAME ERRORS GO HERE</div>
         </div>
     </div>
     <script type="module" src="/js/api.js"></script>

@@ -40,8 +40,9 @@
                 <h3>Most Active Creator</h3>
                 <div id="mostActiveCreator" class="stat-value">
                     <% if (stats.mostActiveCreator) { %>
-                        <%= stats.mostActiveCreator.username %> 
+                        <%= stats.mostActiveCreator.nickname %> 
                         (<%= stats.mostActiveCreator.games %> games)
+                        <div class="user-id">ID: <%= stats.mostActiveCreator.userId %></div>
                     <% } else { %>
                         None
                     <% } %>
@@ -69,6 +70,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Creator</th>
+                            <th>Creator ID</th>
                             <th>Players</th>
                             <th>Created</th>
                         </tr>
@@ -78,7 +80,18 @@
                             <tr>
                                 <td><%= game.name %></td>
                                 <td><%= game.creatorNickname %></td>
-                                <td><%= game.players.length %>/<%= game.maxPlayers %></td>
+                                <td><small><%= game.creator %></small></td>
+                                <td>
+                                    <%= game.players.length %>/<%= game.maxPlayers %>
+                                    <div class="player-list">
+                                        <% game.players.forEach(player => { %>
+                                            <div class="player-item">
+                                                <%= player.nickname %>
+                                                <small>(ID: <%= player.userId %>)</small>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </td>
                                 <td><%= new Date(game.created).toLocaleString() %></td>
                             </tr>
                         <% }); %>
@@ -91,6 +104,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>User ID</th>
                             <th>Username</th>
                             <th>Nickname</th>
                             <th>Joined</th>
@@ -99,6 +113,7 @@
                     <tbody>
                         <% users.slice(-10).forEach(user => { %>
                             <tr>
+                                <td><small><%= user.userId %></small></td>
                                 <td><%= user.username %></td>
                                 <td><%= user.nickname %></td>
                                 <td><%= new Date(user.createdAt).toLocaleString() %></td>

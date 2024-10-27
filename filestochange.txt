@@ -1,0 +1,119 @@
+Files Requiring Changes for User ID Implementation
+==========================================
+
+Database Models
+--------------
+1. models/User.js
+   - Add userId field (UUID)
+   - Update schema validation
+   - Modify UserDB methods to work with userId
+
+2. models/GameState.js
+   - Change players array to store userIds
+   - Update creator field to userId
+   - Add methods to resolve userIds to nicknames
+   - Update GameStateDB methods
+
+3. models/Chat.js
+   - Add userId field to schema
+   - Update message storage to use userId
+   - Modify ChatDB methods for userId lookups
+
+Routes/API Endpoints
+------------------
+4. routes/users.js
+   - Update registration to generate userId
+   - Modify login to return userId
+   - Update profile changes to handle userId
+   - Change account deletion to work with userId
+
+5. routes/lobby.js
+   - Update game creation to use creator's userId
+   - Modify join/leave game to use userId
+   - Update game queries to resolve userIds to nicknames
+
+6. routes/chat.js
+   - Change message creation to use userId
+   - Update message retrieval to include nickname lookups
+   - Modify chat deletion to work with userId
+
+7. routes/admin.js
+   - Update dashboard to show username/nickname with userId
+   - Modify user management to handle userId
+
+Client-Side Code
+---------------
+8. public/js/app.js
+   - Add userId storage
+   - Update all API calls to use userId
+   - Modify game list handling
+   - Update chat message handling
+
+9. public/js/api.js
+   - Update all API method signatures to use userId
+   - Modify request payloads
+   - Update response handling
+
+10. public/js/ui.js
+    - Update renderGamesList to handle userId->nickname mapping
+    - Modify chat message rendering
+    - Update player list displays
+
+Frontend Templates
+----------------
+11. public/index.html
+    - Add userId storage in page
+    - Update data attributes where needed
+
+12. views/admin/dashboard.ejs
+    - Add userId columns/fields
+    - Update user display format
+
+Database Engine
+--------------
+13. database/InMemoryDbEngine.js
+    - Add support for complex joins (userId->nickname)
+    - Update query handling
+
+14. database/MongoDbEngine.js
+    - Add support for MongoDB aggregation pipelines
+    - Update query handling for userId lookups
+
+Middleware
+----------
+15. middleware/validation.js
+    - Add userId validation
+    - Update username validation
+
+16. middleware/errorHandling.js
+    - Add userId-specific error handling
+    - Update error messages
+
+Configuration/Environment
+------------------------
+17. .env
+    - Add any userId-related configuration
+
+Documentation
+------------
+18. api-reference.txt
+    - Update all API documentation
+    - Add userId parameters
+    - Update response formats
+
+19. README.md
+    - Update architecture documentation
+    - Modify setup instructions
+    - Update API examples
+
+Test Files
+----------
+20. tests/
+    - Update all test cases to use userId
+    - Add new tests for userId functionality
+    - Modify fixtures and mock data
+
+Note: This change affects the core identity system of the application. 
+Each file will require careful modification to maintain consistency 
+and prevent breaking changes. A phased migration approach might be 
+necessary to maintain backward compatibility.
