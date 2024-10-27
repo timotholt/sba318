@@ -1,0 +1,219 @@
+/* Common UI Components */
+
+/* Buttons */
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+  letter-spacing: 0.03125rem;
+  position: relative;
+  overflow: hidden;
+  opacity: 1.0;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease-out, height 0.6s ease-out;
+}
+
+button:hover {
+  background: var(--accent-hover);
+  box-shadow: var(--glow);
+  transform: translateY(-0.125rem);
+  opacity: 1;
+}
+
+button:hover::after {
+  width: 300%;
+  height: 300%;
+}
+
+/* Form elements */
+
+/* Base input styles */
+input {
+  opacity: 1;
+  background: var(--bg-darker);
+  border: 0.125rem solid rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  transition: var(--transition);
+  font-size: 1rem;
+}
+
+/* Login/Register specific input styles */
+#loginScreen input,
+#registerScreen input {
+  background: var(--bg-darker);
+  color: var(--text-primary);
+}
+
+/* Input states for login/register */
+#loginScreen input:focus,
+#registerScreen input:focus {
+  background: var(--bg-darker);
+  color: var(--text-primary);
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+  transform: translateY(-0.0625rem);
+}
+
+/* Other input focus styles */
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+  transform: translateY(-0.0625rem);
+}
+
+/* Placeholder styles */
+input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* Add these rules to handle autofill styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-darker) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: var(--transition);
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0.125rem;
+  bottom: -0.125rem;
+  left: 0;
+  background: var(--accent);
+  transition: var(--transition);
+}
+
+a:hover::after {
+  width: 100%;
+  display: inline-block;
+}
+
+/* Error messages */
+.error {
+  margin-top: 0.625rem;
+  background: rgba(255, 23, 68, 0.1);
+  border: 0.0625rem solid var(--danger);
+  color: var(--danger);
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+.error.fade-out {
+  opacity: 0;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-0.0625rem, 0, 0); }
+  20%, 80% { transform: translate3d(0.125rem, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-0.25rem, 0, 0); }
+  40%, 60% { transform: translate3d(0.25rem, 0, 0); }
+}
+
+/* Server status */
+.server-status {
+  background: var(--danger);
+  display: none;
+  padding: 0.875rem;
+  text-align: center;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+.server-status button {
+  background: white;
+  color: var(--danger);
+  padding: 0.5rem 1rem;
+  margin-left: 0.625rem;
+  font-size: 0.875rem;
+}
+
+/* Delete button */
+.delete-btn {
+  background: var(--danger);
+  opacity: 0.8;
+  padding: 0.5rem 1rem;  /* Standardize padding */
+}
+
+.delete-btn:hover {
+  background: var(--danger-hover);
+  box-shadow: var(--glow-danger);
+  opacity: 1;
+}
+
+/* Icon buttons */
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  padding: 0.25rem;
+  width: auto;
+  cursor: pointer;
+  color: var(--accent);
+  opacity: 0.8;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  transform: rotate(90deg);
+}
+
+/* Logout button */
+.logout-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  width: auto;
+  opacity: 0.8;
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  background: var(--danger-hover);
+  opacity: 1;
+  transform: translateY(-0.0625rem);
+  box-shadow: var(--glow-danger);
+}

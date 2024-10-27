@@ -62,44 +62,33 @@ export function showError(message, screenName = 'login') {
 }
 
 export function renderGamesList(games, onDelete, onJoin) {
-
-    // This should never fail unless the HTML is broken
     const gamesListDiv = document.getElementById('gamesList');
     if (!gamesListDiv) return;
 
-    // If there are no games, display that message
     gamesListDiv.innerHTML = games.length ? '' : '  No games available';
 
-    // Otherwise, loop through the games returned from the server
     games.forEach(game => {
-
-        // A game element contains a game info section and the join and delete buttons
         const gameElement = document.createElement('div');
         gameElement.className = 'game-item';
 
-        // The game info is the name of the game/creator/time
         const gameInfo = document.createElement('div');
         gameInfo.className = 'game-info';
 
-        // Get creator's nickname from the user list
         const creatorNickname = game.creatorNickname || 'Unknown User';
 
-        // Add the actual game information to the new child element
         gameInfo.innerHTML = `
             <div class="game-header">
                 <h3>${game.name}</h3>
-                <span class="creator">Created by: ${creatorNickname}</span>
             </div>
-            <div class="players-list">
-                Players (${game.players.length}/${game.maxPlayers})
+            <div class="game-details">
+                <span class="creator">Created by: ${creatorNickname}</span>
+                <span class="players-list">Players (${game.players.length}/${game.maxPlayers})</span>
             </div>
         `;
 
-        // Figure out what buttons we need to add to the name of the game
         const buttonsDiv = document.createElement('div');
         buttonsDiv.className = 'game-buttons';
 
-        // Only show join button if game isn't full
         if (game.players.length < game.maxPlayers) {
             const joinButton = document.createElement('button');
             joinButton.textContent = 'Join';
@@ -108,7 +97,6 @@ export function renderGamesList(games, onDelete, onJoin) {
             buttonsDiv.appendChild(joinButton);
         }
         
-        // Only show delete button if current user is the creator
         if (game.creator === window.globalUserId) {
             const deleteButton = document.createElement('button');
             deleteButton.textContent = '🗑️';
@@ -117,7 +105,6 @@ export function renderGamesList(games, onDelete, onJoin) {
             buttonsDiv.appendChild(deleteButton);
         }
 
-        // Add all of it to the DOM
         gameElement.appendChild(gameInfo);
         gameElement.appendChild(buttonsDiv);
         gamesListDiv.appendChild(gameElement);

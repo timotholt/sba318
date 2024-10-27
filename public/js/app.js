@@ -44,6 +44,46 @@ class GameApp {
         } else {
             this.initialize();
         }
+      
+        ////////////////////////////////
+        // Add this line to store last scroll positions
+        this.chatScrollPositions = new Map();
+        
+        // Bind the resetToLogin method
+        this.resetToLogin = this.resetToLogin.bind(this);
+        
+        // Check session on startup
+        this.checkSession();
+        /////////////////////////
+    }
+
+      resetToLogin() {
+        // Clear session data
+        window.globalUserId = '';
+        window.globalUsername = '';
+        window.globalNickname = '';
+        document.getElementById('globalUserId').value = '';
+        
+        // Stop any polling
+        this.stopPolling();
+        
+        // Reset to login screen
+        showScreen(this.screens, 'login');
+    }
+
+    async checkSession() {
+        // If no userId, reset to login
+        if (!window.globalUserId) {
+            this.resetToLogin();
+            return;
+        }
+        
+        try {
+            // Try to get games list as a simple server check
+            await api.getGames();
+        } catch (error) {
+            this.resetToLogin();
+        }
     }
 
     // This inits the UI.  It should be in the ui.js but I'm afraid of

@@ -1,0 +1,95 @@
+/* Screen layouts and containers */
+.screen {
+  padding: 1.5625rem;
+  max-width: 37.5rem;
+  margin: 1.25rem auto;
+  background: rgba(5, 5, 5, 0.7);
+  backdrop-filter: blur(5rem);
+  -webkit-backdrop-filter: blur(0.625rem);
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.3);
+  border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+  transition: var(--transition);
+  opacity: 0.70;
+}
+
+.screen:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.75rem 2.5rem rgba(0, 0, 0, 0.4);
+  background: rgba(5, 5, 5, 0.8);
+  border: 0.0625rem solid var(--accent-hover);
+  box-shadow: var(--glow);
+}
+
+/* Login/Register screens */
+#loginScreen, #registerScreen {
+  min-width: 25rem;
+  max-width: 25rem;
+}
+
+#loginScreen h2, #registerScreen h2 {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+/* Lobby screen */
+#lobbyScreen {
+  max-width: 50rem;
+  min-width: 50rem;
+}
+
+/* Game screen */
+#gameScreen {
+  max-width: 50rem;
+  min-width: 50rem;
+  padding: 1.5625rem;
+  box-sizing: border-box;
+  margin: 1.25rem auto;
+}
+
+/* Header styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin-bottom: 1.5625rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.header h2 {
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Form layouts */
+.form-group {
+  margin: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+#createGameForm {
+  display: flex;
+  gap: 0.625rem;
+  align-items: stretch;
+}
+
+#createGameButton {
+  margin: 0;
+  white-space: nowrap;
+}
+
+#gamename {
+  flex: 1;
+  margin: 0;
+}
