@@ -37,12 +37,19 @@ export function showError(message, screenName = 'login') {
     if (errorDiv) {
         errorDiv.textContent = message;
         errorDiv.style.display = message ? 'block' : 'none';
+        errorDiv.classList.remove('fade-out');
         
-        setTimeout(() => {
-            if (message.includes('successfully')) {
-                errorDiv.style.display = 'none';
-            }
-        }, 3000);
+        if (message) {
+            // Start fade after 7 seconds (total 10s with animation)
+            setTimeout(() => {
+                errorDiv.classList.add('fade-out');
+                // Hide completely after fade animation
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                    errorDiv.classList.remove('fade-out');
+                }, 3000);
+            }, 7000);
+        }
     }
 }
 

@@ -95,6 +95,8 @@ export const api = {
     },
 
     async sendRequest(url, method = 'GET', data = null) {
+        const serverStatus = document.getElementById('serverStatus');
+        
         try {
             const options = {
                 method,
@@ -108,6 +110,12 @@ export const api = {
             }
 
             const response = await fetch(url, options);
+            
+            // Hide server status if request succeeds
+            if (serverStatus) {
+                serverStatus.style.display = 'none';
+            }
+
             const result = await response.json();
             
             if (!response.ok) {
@@ -116,12 +124,17 @@ export const api = {
             
             return result;
         } catch (error) {
+            // Show server status on connection error
+            if (!error.response && serverStatus) {
+                serverStatus.style.display = 'block';
+            }
+            
             if (error.response) {
                 throw error;
             }
+            
             console.error('API Error:', error);
-            throw { response: { message: 'An unexpected error occurred' } };
+            throw { response: { message: 'Server connection lost. Please try again later.' } };
         }
     }
 };
-

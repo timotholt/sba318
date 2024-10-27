@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <div id="app">
+    <div id="serverStatus" class="server-status">
+        <div class="status-message">
+            Server connection lost. Retrying...
+            <button onclick="window.location.reload()">Reload Now</button>
+        </div>
+    </div>  
+  
+  <div id="app">
         <!-- Add hidden input for userId storage -->
         <input type="hidden" id="globalUserId">
         
@@ -62,19 +69,21 @@
                     <button id="logoutButton" class="logout-btn" data-userid="">Logout</button>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="createGameForm">
                 <input type="text" id="gameName" placeholder="Enter game name">
                 <button id="createGameButton" data-userid="">Create Game</button>
                 <div id="lobbyError" class="error"></div>
             </div>
             <div class="filter-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showMyGamesOnly" data-userid="">
-                    Only show my games
-                </label>
             </div>
             <div id="gamesList" data-userid=""></div>
-            <div id="refreshTimer" class="refresh-timer"></div>
+              <div class="miniStatusRow">
+                <label class="checkbox-label">
+                <input type="checkbox" id="showMyGamesOnly" data-userid="">
+                    Only show my games
+                </label>
+                <div id="refreshTimer" class="refresh-timer"></div>
+              </div>
             <div id="lobbyChatContainer" class="chat-container">
                 <div id="lobbyChatMessages" class="chat-messages" data-userid=""></div>
                 <div class="chat-input">
