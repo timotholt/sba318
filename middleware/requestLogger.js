@@ -17,9 +17,9 @@ export function requestLogger(req, res, next) {
 
     // Format request body (excluding sensitive data)
     const sanitizedBody = { ...req.body };
-    if (sanitizedBody.password) sanitizedBody.password = '[REDACTED]';
-    if (sanitizedBody.currentPassword) sanitizedBody.currentPassword = '[REDACTED]';
-    if (sanitizedBody.newPassword) sanitizedBody.newPassword = '[REDACTED]';
+    // if (sanitizedBody.password) sanitizedBody.password = '[REDACTED]';
+    // if (sanitizedBody.currentPassword) sanitizedBody.currentPassword = '[REDACTED]';
+    // if (sanitizedBody.newPassword) sanitizedBody.newPassword = '[REDACTED]';
     
     // Log the request
     console.log(`[${timestamp}] ${method} ${originalUrl}

@@ -50,13 +50,17 @@ router.post('/login', validateUsername, async (req, res, next) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] POST /login - Parameters:`, {
         username: req.body.username,
+      password: req.body.password,
         passwordLength: req.body.password?.length || 0
     });
+
+  
 
     try {
         const { username, password } = req.body;
 
-        const user = await UserDB.findOne({ username });
+              // Use findOneActive to exclude deleted users
+        const user = await UserDB.findOneActive({ username });
         if (!user || user.password !== password) {
             throw new APIError('Invalid username or password', 401);
         }
@@ -155,6 +159,7 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
             throw new APIError('User not found', 404);
         }
 
+      // Check for active games
         const games = await GameStateDB.findAll();
         const activeGames = games.filter(game => 
             game.creator === username && 
@@ -169,33 +174,24 @@ router.delete('/:username', validateUsername, async (req, res, next) => {
             );
         }
 
-        await GameStateDB.delete({ creator: username });
+      // Instead of a hard delete, mark a soft delete
+      await UserDB.softDelete(user.userId);
 
+        // await GameStateDB.delete({ creator: username });
+
+       // Remove from active games
         for (const game of games) {
-            const playerIndex = game.players.indexOf(username);
-            if (playerIndex !== -1) {
-                game.players.splice(playerIndex, 1);
-                game.playerNicknames.splice(playerIndex, 1);
-                await GameStateDB.update({ id: game.id }, { 
-                    players: game.players,
-                    playerNicknames: game.playerNicknames 
-                });
+            if (game.players.includes(username)) {
+                game.players = game.players.filter(p => p !== username);
+                await GameStateDB.update({ id: game.id }, { players: game.players });
             }
         }
 
         // Update all chat messages from this user
         await ChatDB.update(
             { username: username },
-            { 
-                nickname: "Deleted User",
-                username: "deleted_" + username
-            }
+            { nickname: "Deleted User" },
         );
-
-        const result = await UserDB.delete({ username });
-        if (result.deletedCount === 0) {
-            throw new APIError('User not found', 404);
-        }
 
         res.json({ success: true });
     } catch (error) {
