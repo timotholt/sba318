@@ -56,6 +56,24 @@ looks amazing!
 | Level of effort displayed in creativity, presentation, and user experience | 5% | ✅ |
 
 
+## There are 3 paths in the main API to meet the requirements:
+
+- The API is RESTFUL... the documentation can be found in api-reference.txt.  It's mostly
+correct.  Real quick:
+
+/users
+-- This endpoint creates users (POST), updates users info (PATCH), queries users (GET)k
+login (POST), logout (POST)
+
+/lobby
+-- This endpoint lets you create (POST) and fetch (GET) chatrooms/enter chatrooms/leave chatrooms
+
+/chat
+-- This endpoint fetches chat data for a user or for the lobby
+
+The full details of all the routes are in api-reference.txt
+
+
 ## Accessing the EJS page
 
 I ran out of time and didn't build a full "page" for the EJS part of the requirements.  I serve
@@ -95,11 +113,6 @@ windows and connect to the chat server before launching the EJS page.
 - Real-time player list updates
 - Nickname display for all players
 - You can password protect a room
-
-## API Documentation
-
-- The API is RESTFUL... the documentation can be found in api-reference.txt
-- It is out of date. It's like 80% correct.
 
 ## Database System
 
