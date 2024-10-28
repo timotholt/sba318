@@ -74,7 +74,7 @@ export const api = {
     },
 
     async joinGame(gameId, userId, password = '') {
-      window.alert('API joinGame called with:', { gameId, userId, password });
+    //   window.alert('API joinGame called with:', { gameId, userId, password });
       console.log('API joinGame called with:', { gameId, userId, password });
         return this.sendRequest(`/lobby/${gameId}/join`, 'POST', { userId, password });
     },

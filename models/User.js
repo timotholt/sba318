@@ -92,6 +92,8 @@ export const UserDB = {
     return await db.getEngine().update(User, { userId }, data);
   },
 
+  // Users are never deleted from the database, they are just marked as deleted
+  // and have their nickname changed. This "hack" fixes SO many problems!
   async softDelete(userId) {
     return await db.getEngine().update(User, 
       { userId }, 

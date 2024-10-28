@@ -67,7 +67,7 @@
 
 .game-item:hover {
   filter: brightness(1.4);
-  transform: translateX(0.25rem);
+  /* transform: translateX(0.25rem); */
   transition: all 0.3s ease;
   border: 1px solid var(--accent);
 }
@@ -174,7 +174,7 @@
 }
 
 .chat-message:hover {
-  transform: translateX(0.25rem);
+  /* transform: translateX(0.25rem); */
   box-shadow: -0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.2);
 }
 

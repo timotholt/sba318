@@ -1,3 +1,5 @@
+// I coudldn't get MongooseDB to work so ignore it!
+
 import mongoose from 'mongoose';
 import { db } from '../database/database.js';
 

@@ -2,9 +2,10 @@ import crypto from 'crypto';
 import { UserDB } from './User.js';
 import { chatService } from '../services/ChatService.js';
 
+// System messages have a special UUID (0), cause it makes life easier!
 const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
 const SYSTEM_USERNAME = 'system';
-const SYSTEM_NICKNAME = 'System';
+const SYSTEM_NICKNAME = '<system>';
 
 export class SystemMessages {
     static async initialize() {

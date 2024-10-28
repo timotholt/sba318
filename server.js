@@ -22,7 +22,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Add this near the top of server.js, after creating the app
+// This was a hail Mary to see if I could get it to access mongoDb but it didn't work.
 app.set('trust proxy', true);
 
 // View engine setup
@@ -35,6 +35,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Security middleware
 app.use(mongoSanitize());
+
+// This was cut and paste from stackexchange to try to get mongoDb to work
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
@@ -64,11 +66,12 @@ app.get('/about', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+// I couldn't get this to work right so ignore it!
 // Graceful shutdown handler
-process.on('SIGTERM', async () => {
-    await SystemMessages.serverShutdown(5);
-    setTimeout(() => process.exit(0), 5000);
-});
+// process.on('SIGTERM', async () => {
+//     await SystemMessages.serverShutdown(5);
+//     setTimeout(() => process.exit(0), 5000);
+// });
 
 // Start the database and system user
 try {
@@ -79,10 +82,12 @@ try {
     process.exit(1);
 }
 
-// Start the server
+// This build script step didn't work :/  ignore it
 import { buildInfo } from './buildInfo.js';
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    console.log(`Game Server Version: ${buildInfo.version} (Built: ${buildInfo.buildDate})`);
+    
+    // Build script doesn't work.  What was I thinking?
+    // console.log(`Chat Server Version: ${buildInfo.version} (Built: ${buildInfo.buildDate})`);
 });

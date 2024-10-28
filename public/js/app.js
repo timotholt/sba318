@@ -31,7 +31,7 @@ class GameApp {
         this.currentGameId = null;
 
         // This controls how often we poll the server for new chat messages
-        this.chatDelay    = 100000;      // 100 second
+        this.chatDelay    = 2000;      // 2 seconds
         this.chatInterval = null;
 
         // This controls how often we poll the server for a new game list
