@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game App</title>
+    <title>Chat Room App</title>
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
         
         <!-- Login screen remains mostly the same -->
         <div id="loginScreen" class="screen">
-            <h2>Login To Game Server</h2>
+            <h2>Login To Chat Server</h2>
             <div class="form-group">
                 <input type="text" id="username" placeholder="Enter username">
                 <input type="password" id="password" placeholder="Enter password">
@@ -53,7 +53,7 @@
         <!-- Lobby screen - update data attributes -->
         <div id="lobbyScreen" class="screen hidden">
             <div class="header">
-                <h2>Game Lobby</h2>
+                <h2>Chat Lobby</h2>
                 <div class="header-buttons">
                     <button id="settingsButton" class="icon-btn" data-userid="">⚙️</button>
                     <button id="logoutButton" class="logout-btn" data-userid="">Logout</button>
@@ -61,7 +61,7 @@
             </div>
             <div class="form-group" id="createGameForm">
                 <input type="text" id="gameName" placeholder="Enter game name">
-                <button id="createGameButton" data-userid="">Create Game</button>
+                <button id="createGameButton" data-userid="">Create Chat Room</button>
                 <div id="lobbyError" class="error"></div>
             </div>
             <div class="filter-group">
@@ -73,7 +73,7 @@
             <div class="miniStatusRow">
                 <label class="checkbox-label">
                     <input type="checkbox" id="showMyGamesOnly" data-userid="">
-                    Only show my games
+                    Only show my chat rooms
                 </label>
                 <div id="refreshTimer" class="refresh-timer"></div>
             </div>
@@ -112,14 +112,14 @@
         </div>
         <div id="gameScreen" class="screen hidden">
             <div class="header">
-                <h2>Game: <span id="currentGameName"></span></h2>
-                <button id="backToLobbyButton" data-userid="">Leave Game</button>
+                <h2>Chat Room: <span id="currentGameName"></span></h2>
+                <button id="backToLobbyButton" data-userid="">Leave Room</button>
             </div>
             <div id="gameContent" data-userid=""></div>
             <div id="gameChatContainer" class="chat-container">
                 <div id="gameChatMessages" class="chat-messages" data-userid=""></div>
                 <div class="chat-input">
-                    <input type="text" id="gameChatInput" placeholder="Game chat..." data-userid="">
+                    <input type="text" id="gameChatInput" placeholder="Room chat..." data-userid="">
                     <button id="sendGameChatMessage" data-userid="">Send</button>
                 </div>
             </div>

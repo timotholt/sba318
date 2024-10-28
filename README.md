@@ -1,6 +1,10 @@
-# Game Lobby Application
 
-A real-time game lobby system built with Node.js, Express, and a modular database system supporting both in-memory and MongoDB storage (MongoDB part doesn't work actually).
+
+
+
+# SBA318 - Real-time Chat Lobby Application
+
+A real-time chat lobby system built with Node.js, Express, and a modular database system supporting both in-memory and MongoDB storage (MongoDB part doesn't work actually).
 
 | Requirement | Weight | Completed |
 | :--- | :---: | :---: |
@@ -27,10 +31,19 @@ A real-time game lobby system built with Node.js, Express, and a modular databas
 | Level of effort displayed in creativity, presentation, and user experience | 5% | ✅ |
 
 
+## Launching the app:
+
+nodemon 
+
+## STUFF THAT IS BROKEN
+
+- If the server is not running, index.html breaks badly.
+
+
 ## Features
 
 - User authentication (register/login)
-- Real-time game lobby
+- Real-time lobby
 - Create and join chat rooms with player limits
 - Nickname support for players
 - Modular database system (in-memory or MongoDB - again, which doesn't work yet)
@@ -39,7 +52,7 @@ A real-time game lobby system built with Node.js, Express, and a modular databas
 ## Chat Room Features
 
 - Create rooms with customizable player limits (1-4 players)
-- Join/leave gameschat rooms
+- Join/leave chat rooms
 - Real-time player list updates
 - Nickname display for all players
 - You can password protect a room
