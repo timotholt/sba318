@@ -25,6 +25,10 @@ const gameStateSchema = new mongoose.Schema({
     max: 4,
     default: 4
   },
+  password: {
+    type: String,
+    default: ''
+  },
   players: [{
     type: String  // Array of userIds
   }],

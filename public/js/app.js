@@ -3,7 +3,8 @@
 //==============================
 
 import { api } from './api.js';
-import { showScreen, showError, renderGamesList, clearAllErrors } from './ui.js';
+import { showScreen, showError, renderGamesList, clearAllErrors, showCreateGameModal, showGetGamePasswordModal } from './ui.js';
+// import { showScreen, showError, renderGamesList, clearAllErrors } from './ui.js';
 import { validation } from '../../utils/validation.js';
 
 // Yea we use global variables.  I ran into so many problems
@@ -30,7 +31,7 @@ class GameApp {
         this.currentGameId = null;
 
         // This controls how often we poll the server for new chat messages
-        this.chatDelay    = 1000;      // 1 second
+        this.chatDelay    = 100000;      // 100 second
         this.chatInterval = null;
 
         // This controls how often we poll the server for a new game list
@@ -365,26 +366,37 @@ class GameApp {
         }
     }
     
-    async createGame() {
-        const gameNameInput = document.getElementById('gameName');
-        const gameName = gameNameInput.value.trim();
+    // async createGame() {
+    //     const gameNameInput = document.getElementById('gameName');
+    //     const gameName = gameNameInput.value.trim();
         
-        if (!gameName) {
-            showError('Please enter a game name', 'lobby');
-            return;
-        }
+    //     if (!gameName) {
+    //         showError('Please enter a game name', 'lobby');
+    //         return;
+    //     }
 
+    //     try {
+    //         const response = await api.createGame(gameName, window.globalUserId);
+    //         if (response?.success) {
+    //             gameNameInput.value = '';
+    //             this.updateGamesList();
+    //         }
+    //     } catch (error) {
+    //         showError('Failed to create game. Please try again.', 'lobby');
+    //     }
+    // }
+    async createGame() {
+    showCreateGameModal(async (name, password, maxPlayers) => {
         try {
-            const response = await api.createGame(gameName, window.globalUserId);
+            const response = await api.createGame(name, window.globalUserId, maxPlayers, password);
             if (response?.success) {
-                gameNameInput.value = '';
                 this.updateGamesList();
             }
         } catch (error) {
             showError('Failed to create game. Please try again.', 'lobby');
         }
-    }
-    
+    });
+}
     async deleteGame(gameId) {
         try {
             const response = await api.deleteGame(gameId, window.globalUserId);
@@ -396,23 +408,59 @@ class GameApp {
         }
     }
 
-    async joinGame(gameId) {
-        try {
-            const response = await api.joinGame(gameId, window.globalUserId);
-            if (response?.success) {
-                this.currentGameId = gameId;
+    // async joinGame(gameId) {
+    //     try {
+    //         const response = await api.joinGame(gameId, window.globalUserId);
+    //         if (response?.success) {
+    //             this.currentGameId = gameId;
 
-              // Set the game name in the header
-                document.getElementById('currentGameName').textContent = response.game.name;
-                showScreen(this.screens, 'game');
+    //           // Set the game name in the header
+    //             document.getElementById('currentGameName').textContent = response.game.name;
+    //             showScreen(this.screens, 'game');
+    //         }
+    //     } catch (error) {
+    //         showError('Failed to join game. Please try again.', 'lobby');
+    //     }
+
+    //       // Erase game chat window
+    //       this.eraseChatWindow("gameChatMessages");
+    // }
+
+async joinGame(gameId) {
+    try {
+
+      debugger;
+      
+        // First try to join without password
+        let response = await api.joinGame(gameId, window.globalUserId);
+        
+        // If game needs password
+        if (response.needsPassword) {
+            // Get password from user
+            const password = await showGetGamePasswordModal();
+            if (password === null) {
+                console.log(`user canceled join with password`);
+                return; // User cancelled
             }
-        } catch (error) {
-            showError('Failed to join game. Please try again.', 'lobby');
+
+          debugger;
+            // Try again with password
+            response = await api.joinGame(gameId, window.globalUserId, password);
+
+          debugger;
         }
 
-          // Erase game chat window
-          this.eraseChatWindow("gameChatMessages");
+        if (response?.success) {
+            this.currentGameId = gameId;
+            document.getElementById('currentGameName').textContent = response.game.name;
+            this.eraseChatWindow("gameChatMessages");
+            showScreen(this.screens, 'game');
+        }
+    } catch (error) {
+        showError(error.response?.message || 'Failed to join game', 'lobby');
     }
+}
+
 
     async sendLobbyChatMessage() {
         const input = document.getElementById('lobbyChatInput');

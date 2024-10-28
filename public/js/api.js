@@ -53,19 +53,30 @@ export const api = {
         return this.sendRequest(url, 'GET');
     },
   
-    async createGame(name, creator) {
+    // async createGame(name, creator) {
+    //     return this.sendRequest('/lobby', 'POST', { 
+    //         name, 
+    //         creator // This is now userId
+    //     });
+    // },
+
+    async createGame(name, creator, maxPlayers = 4, password = '') {
         return this.sendRequest('/lobby', 'POST', { 
             name, 
-            creator // This is now userId
+            creator,
+            maxPlayers,
+            password
         });
-    },
-
+},
+  
     async deleteGame(gameId, userId) {
         return this.sendRequest(`/lobby/${gameId}?userId=${userId}`, 'DELETE');
     },
 
-    async joinGame(gameId, userId) {
-        return this.sendRequest(`/lobby/${gameId}/join`, 'POST', { userId });
+    async joinGame(gameId, userId, password = '') {
+      window.alert('API joinGame called with:', { gameId, userId, password });
+      console.log('API joinGame called with:', { gameId, userId, password });
+        return this.sendRequest(`/lobby/${gameId}/join`, 'POST', { userId, password });
     },
 
     async leaveGame(gameId, userId) {
