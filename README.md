@@ -1,81 +1,49 @@
 # Game Lobby Application
 
-A real-time game lobby system built with Node.js, Express, and a modular database system supporting both in-memory and MongoDB storage.
+A real-time game lobby system built with Node.js, Express, and a modular database system supporting both in-memory and MongoDB storage (MongoDB part doesn't work actually).
+
+| Requirement | Weight | Completed |
+| :--- | :---: | :---: |
+| Create and use at least two pieces of custom middleware. | 5% | ✅ |
+| Create and use error-handling middleware. | 5% | ✅ |
+| Use at least three different data categories (e.g., users, posts, or comments). | 5% | ✅ |
+| Utilize reasonable data structuring practices. | 5% | ✅ |
+| Create GET routes for all data that should be exposed to the client. | 5% | ✅ |
+| Create POST routes for data, as appropriate. At least one data category should allow for | client creation via a POST request. | 5% | ✅ |
+| Create PATCH or PUT routes for data, as appropriate. At least one data category should allow for client manipulation via a PATCH or PUT request. | 5% | ✅ |
+| Create DELETE routes for data, as appropriate. At least one data category should allow for client deletion via a DELETE request. | 5% | ✅ |
+| Include query parameters for data filtering, where appropriate. At least one data category should allow for additional filtering through the use of query parameters. ✅ |
+| Note: DO NOT use API keys; this makes it more difficult for instructors to grade finished projects efficiently. | 5% | ✅ |
+| Utilize route parameters, where appropriate. | 5% | ✅ |
+| Adhere to the guiding principles of REST. | 10% | ✅ |
+| Create and render at least one view using a view template and template engine. This can be a custom template engine or a third-party engine. ✅ |
+| If you are stuck on how to approach this, think about ways you could render the current state of your API's data for easy viewing. | 8% | ✅ |
+| Use simple CSS to style the rendered views. ✅ |
+| Note: This is not a test of design; it is a test of serving static files using Express. The CSS can be very simple. | 2% | ✅ |
+| Include a form within a rendered view that allows for interaction with your RESTful API. | 3%  | ✅ |
+| Utilize reasonable code organization practices. | 5% | ✅ |
+| Ensure that the program runs without errors (comment out things that do not work, and explain your blockers - you can still receive partial credit). | 10% | ✅ |
+| Commit frequently to the git repository. | 5% | ✅ |
+| Include a README file that contains a description of your application. | 2% | ✅ |
+| Level of effort displayed in creativity, presentation, and user experience | 5% | ✅ |
+
 
 ## Features
 
 - User authentication (register/login)
 - Real-time game lobby
-- Create and join games with player limits
-- Nickname support for all players
-- Modular database system (in-memory or MongoDB)
-- Security features
+- Create and join chat rooms with player limits
+- Nickname support for players
+- Modular database system (in-memory or MongoDB - again, which doesn't work yet)
+- Security features (sorta, it's middleware and if you run the server too long it disconects)
 
-## Prerequisites
+## Chat Room Features
 
-- Node.js (v14 or higher)
-- MongoDB Atlas account (optional - only if using MongoDB)
-- Modern web browser
-
-## Setup
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Configure environment:
-   - Copy `.env.example` to `.env`
-   - Choose database type (memory or mongodb)
-   - If using MongoDB, update connection string
-   ```
-   DB_TYPE=memory        # Use 'mongodb' for MongoDB
-   MONGODB_URI=your_mongodb_connection_string
-   MONGO_ADMIN_URL=your_mongodb_admin_url
-   ```
-
-## Running the Application
-
-```bash
-npm start
-```
-
-Server will start on port 3000 (or PORT from environment variables)
-
-## Project Structure
-
-```
-├── database/
-│   ├── BaseDbEngine.js     # Base database engine interface
-│   ├── InMemoryDbEngine.js # In-memory database implementation
-│   ├── MongoDbEngine.js    # MongoDB database implementation
-│   ├── database.js         # Database connection manager
-│   └── selectDbEngine.js   # Database engine factory
-├── middleware/
-│   └── validation.js       # Request validation
-├── models/
-│   ├── User.js            # User model
-│   └── GameState.js       # Game state model
-├── public/
-│   ├── js/
-│   │   ├── api.js         # API client
-│   │   ├── app.js         # Main application logic
-│   │   └── ui.js          # UI management
-│   ├── index.html         # Main HTML
-│   └── styles.css         # Styles
-├── routes/
-│   ├── lobby.js           # Game lobby routes
-│   └── users.js          # User routes
-└── server.js              # Express server setup
-```
-
-## Game Features
-
-- Create games with customizable player limits (1-4 players)
-- Join/leave games
+- Create rooms with customizable player limits (1-4 players)
+- Join/leave gameschat rooms
 - Real-time player list updates
 - Nickname display for all players
-- Game creator controls
+- You can password protect a room
 
 ## API Documentation
 
@@ -85,7 +53,7 @@ Server will start on port 3000 (or PORT from environment variables)
 
 The application uses a modular database system that supports:
 - In-memory storage (development)
-- MongoDB (production)
+- MongoDB (doesn't work yet!)
 - Extensible for other database types
 
 To add a new database engine:
@@ -95,14 +63,3 @@ To add a new database engine:
 4. Add to `selectDbEngine.js`
 5. Update DB_TYPE in `.env`
 
-## Contributing
-
-1. Fork the repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Create Pull Request
-
-## License
-
-MIT License
