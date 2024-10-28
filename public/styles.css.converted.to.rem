@@ -1,0 +1,584 @@
+/* Modern animated dark theme */
+:root {
+  /* Set base font size for rem calculations */
+  font-size: 16px; /* This makes 1rem = 16px */
+  
+  /* Theme variables */
+  --bg-dark: #0a0a0a;
+  --bg-darker: #050505;
+  --bg-lighter: #1a1a1a;
+  --text-primary: #dfdfdf;
+  --text-secondary: #bfbfbf;
+  --accent: #00b853;
+  --accent-hover: #00d676;
+  --danger: #ff1744;
+  --danger-hover: #ff4081;
+  --glow: 0 0 2.5rem rgba(0, 200, 83, 0.4);
+  --glow-danger: 0 0 2.5rem rgba(255, 23, 68, 0.4);
+  --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::selection, ::checked {
+    background: var(--accent);
+    color: var(--bg-darker);
+    text-shadow: none;
+}
+
+::-moz-selection {
+    background: var(--accent);
+    color: var(--bg-darker);
+    text-shadow: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    opacity: 1;
+    z-index: -1;
+    background-image: 
+      linear-gradient(45deg, var(--accent) 0.0625rem, transparent 0.0625rem),
+      linear-gradient(-45deg, var(--accent) 0.0625rem, transparent 0.0625rem);
+    background-size: 3.125rem 3.125rem;
+    animation: slideBackground 120s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes slideBackground {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.screen {
+    padding: 1.5625rem;
+    max-width: 37.5rem;
+    margin: 1.25rem auto;
+    background: rgba(5, 5, 5, 0.7);
+    backdrop-filter: blur(5rem);
+    -webkit-backdrop-filter: blur(0.625rem);
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.3);
+    border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+    transition: var(--transition);
+    opacity: 0.70;
+}
+
+#loginScreen {
+    min-width: 37.5rem;
+    max-width: 37.5rem;
+}
+
+#lobbyScreen {
+    max-width: 50rem;
+    min-width: 50rem;
+}
+
+#gameScreen {
+    max-width: 50rem;
+    min-width: 50rem;
+    padding: 1.5625rem;
+    box-sizing: border-box;
+    margin: 1.25rem auto;
+}
+
+#gameContent {
+    width: 100%;
+    height: 31.25rem;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: var(--bg-darker);
+    border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+    margin-bottom: 1.25rem;
+    transition: var(--transition);
+}
+
+#gameContent:hover {
+    border: 0.0625rem solid var(--accent-hover);
+    box-shadow: var(--glow);
+}
+
+#gameScreen .header {
+    width: 100%;
+    margin-bottom: 0.9375rem;
+    box-sizing: border-box;
+}
+
+#gameScreen .header h2 {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+#gameScreen #backToLobbyButton {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.9rem;
+    background: var(--danger);
+    opacity: 0.8;
+}
+
+#gameScreen #backToLobbyButton:hover {
+    background: var(--danger-hover);
+    opacity: 1;
+    box-shadow: var(--glow-danger);
+}
+
+#gameScreen .chat-container {
+    margin-top: 0;
+    height: 15.625rem;
+    width: 100%;
+}
+
+#gameScreen .chat-messages {
+    max-height: 9.375rem;
+    min-height: 9.375rem;
+}
+
+.screen:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.75rem 2.5rem rgba(0, 0, 0, 0.4);
+    background: rgba(5, 5, 5, 0.8);
+    border: 0.0625rem solid var(--accent-hover);
+    box-shadow: var(--glow);
+}
+
+.form-group {
+    margin: 1.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+#createGameForm {
+    display: flex;
+    gap: 0.625rem;
+    align-items: stretch;
+}
+
+#createGameButton {
+    margin: 0;
+    white-space: nowrap;
+}
+
+input {
+    opacity: 1;
+    background: var(--bg-darker);
+    border: 0.125rem solid rgba(255, 255, 255, 0.3);
+    color: var(--text-secondary);
+    padding: 0.875rem;
+    border-radius: 0.5rem;
+    margin: 0.5rem 0;
+    transition: var(--transition);
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+    transform: translateY(-0.0625rem);
+    color: var(--text-primary);
+}
+
+#gamename {
+    flex: 1;
+    margin: 0;
+}
+
+button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.875rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    letter-spacing: 0.03125rem;
+    position: relative;
+    overflow: hidden;
+    opacity: 1.0;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease-out, height 0.6s ease-out;
+}
+
+button:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--glow);
+    transform: translateY(-0.125rem);
+    opacity: 1;
+}
+
+button:hover::after {
+    width: 300%;
+    height: 300%;
+}
+
+#gamesList {
+    display-flex;
+    flex-direction: column;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    margin: 0.125rem 0;
+    transition: var(--transition);
+    border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) var(--bg-darker);
+    max-height: 25rem;
+    min-height: 25rem;
+}
+
+#gamesList:hover {
+    border: 0.0625rem solid var(--accent);
+    box-shadow: var(--glow);
+    transition: var(--transition);
+}
+
+.game-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin: 0.5rem 0;
+    transition: var(--transition);
+}
+
+.game-item:hover {
+    transform: translateX(0.25rem);
+}
+
+.game-info {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex: 1;
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    min-width: 18.75rem;
+}
+
+.game-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.creator {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.players-list {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.game-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.game-buttons button {
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.miniStatusRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 0.625rem;
+    opacity: 0.7;
+}
+
+.miniStatusRow:hover {
+    opacity: 1;
+}
+
+.checkbox-label {
+    opacity: 0.7;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.refresh-timer {
+    text-align: right;
+}
+
+.chat-container {
+    display-flex;
+    flex-direction: column;
+    border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+    height: 18.75rem;
+    margin-top: 1.25rem;
+    transition: var(--transition);
+    padding-top: 0.625rem;
+}
+
+.chat-container:hover {
+    border: 0.0625rem solid var(--accent-hover);
+    box-shadow: var(--glow);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.9375rem;
+    margin-bottom: 0;
+    min-height: 12.5rem;
+    max-height: 12.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) var(--bg-darker);
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: var(--bg-darker);
+    border-radius: 0.25rem;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 0.25rem;
+}
+
+.chat-message {
+    background: var(--bg-darker);
+    padding: 0.125rem;
+    transition: var(--transition);
+}
+
+.chat-message:hover {
+    transform: translateX(0.25rem);
+    box-shadow: -0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.chat-nickname {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.chat-nickname.system-user {
+    color: #FFD700;
+}
+
+.chat-timestamp {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.chat-input {
+    display: flex;
+    padding: 0.625rem;
+    background: var(--bg-darker);
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
+.chat-input input {
+    flex: 1;
+    margin: 0 0.625rem 0 0;
+    padding: 0.625rem;
+}
+
+.chat-input button {
+    width: auto;
+    margin: 0;
+    padding: 0.625rem 1.25rem;
+}
+
+.error {
+    margin-top: 0.625rem;
+    background: rgba(255, 23, 68, 0.1);
+    border: 0.0625rem solid var(--danger);
+    color: var(--danger);
+    border-radius: 0.5rem;
+    padding: 0.875rem;
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+
+.error.fade-out {
+    opacity: 0;
+}
+
+@keyframes fadeOutAfterDelay {
+    0%, 70% { opacity: 1; visibility: visible; }
+    100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-0.0625rem, 0, 0); }
+    20%, 80% { transform: translate3d(0.125rem, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-0.25rem, 0, 0); }
+    40%, 60% { transform: translate3d(0.25rem, 0, 0); }
+}
+
+.delete-btn {
+    background: var(--danger);
+    opacity: 0.8;
+}
+
+.delete-btn:hover {
+    background: var(--danger-hover);
+    box-shadow: var(--glow-danger);
+    opacity: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin-bottom: 1.5625rem;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.25rem;
+    width: auto;
+    cursor: pointer;
+    color: var(--accent);
+    opacity: 0.8;
+    transition: var(--transition);
+}
+
+.icon-btn:hover {
+    transform: rotate(90deg);
+}
+
+.logout-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    width: auto;
+    opacity: 0.8;
+    transition: var(--transition);
+}
+
+.logout-btn:hover {
+    background: var(--danger-hover);
+    opacity: 1;
+    transform: translateY(-0.0625rem);
+    box-shadow: var(--glow-danger);
+}
+
+.header h2 {
+    font-weight: 700;
+    margin: 0;
+}
+
+.server-status {
+    background: var(--danger);
+    display: none;
+    padding: 0.875rem;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+.server-status button {
+    background: white;
+    color: var(--danger);
+    padding: 0.5rem 1rem;
+    margin-left: 0.625rem;
+    font-size: 0.875rem;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--transition);
+    position: relative;
+}
+
+a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0.125rem;
+    bottom: -0.125rem;
+    left: 0;
+    background: var(--accent);
+    transition: var(--transition);
+}
+
+a:hover::after {
+    width: 100%;
+    display: inline-block;
+}
+
+#showLoginButton, #showRegisterButton {
+    margin-left: 1rem;
+}
+
+#dashboard-link {
+    display: inline-block;
+}

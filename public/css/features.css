@@ -19,25 +19,30 @@
   box-shadow: var(--glow);
 }
 
+/* Games list wrapper - NEW */
+.games-list-wrapper {
+  border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  padding: 0;
+  margin: 0.125rem 0;
+  transition: var(--transition);
+  overflow: hidden; /* Clip children including scrollbar */
+}
+
+.games-list-wrapper:hover {
+  border: 0.0625rem solid var(--accent);
+  box-shadow: var(--glow);
+}
+
 /* Games list */
 #gamesList {
   display: flex;
   flex-direction: column;
-  border-radius: 0.75rem;
   padding: 0.75rem;
-  margin: 0.125rem 0;
-  transition: var(--transition);
-  border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+  height: 25rem;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-darker);
-  max-height: 25rem;
-  min-height: 25rem;
-}
-
-#gamesList:hover {
-  border: 0.0625rem solid var(--accent);
-  box-shadow: var(--glow);
 }
 
 /* Games list items */
@@ -53,16 +58,15 @@
 
 /* Alternating backgrounds for game items */
 .game-item:nth-child(even) {
-  background: rgba(255, 255, 255, 0.12); /* Very subtle light background */
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .game-item:nth-child(odd) {
-  background: rgba(0, 0, 0, 0.2); /* Very subtle dark background */
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* Replace the existing .game-item:hover style */
 .game-item:hover {
-  filter: brightness(1.4); /* Increases brightness by 20% */
+  filter: brightness(1.4);
   transform: translateX(0.25rem);
   transition: all 0.3s ease;
   border: 1px solid var(--accent);
@@ -82,13 +86,13 @@
   justify-content: space-between;
   align-items: baseline;
   width: 100%;
-  margin-bottom: 0.125rem; /* Changed from 0.03125rem to 0.125rem (2px) */
+  margin-bottom: 0.125rem;
   line-height: 1;
 }
 
 .game-header h3 {
   margin: 0;
-  font-size: 1.0rem;    /* Increased from 1rem (10% bigger) */
+  font-size: 1.0rem;
   font-weight: 600;
   color: var(--accent);
 }
@@ -96,10 +100,11 @@
 .game-details {
   display: flex;
   gap: 1rem;
-  font-size: 0.72rem;   /* Decreased from 0.8rem (10% smaller) */
+  font-size: 0.72rem;
   color: var(--text-secondary);
   line-height: 1;
 }
+
 .creator {
   white-space: nowrap;
 }
@@ -111,14 +116,14 @@
 .game-buttons {
   display: flex;
   gap: 0.75rem;
-  align-self: center;    /* Center buttons vertically */
+  align-self: center;
 }
 
 .game-buttons button {
-  padding: 0.2rem 0.9rem;  /* Reduced from 0.4rem to 0.2rem */
+  padding: 0.2rem 0.9rem;
   margin: 0;
   font-size: 0.85rem;
-  height: 1.8rem;         /* Reduced from 2.3rem to 1.8rem */
+  height: 1.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
