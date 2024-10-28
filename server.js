@@ -49,7 +49,7 @@ app.use(requestLogger);
 
 // Static files
 app.use(express.static('public'));
-// app.use(express.static('public/admin'));
+app.use(express.static('public/admin'));
 app.use('/utils', express.static('utils'));
 
 // Routes
