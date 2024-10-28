@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Server Admin Dashboard</title>
-    <link rel="stylesheet" href="/admin/styles.css">
+    <link rel="stylesheet" href="/admin/dashboard.css">
 </head>
 <body>
     <div class="dashboard">
         <header class="dashboard-header">
             <h1>Game Server Statistics</h1>
+            <div class="filters">
+                <form class="filter-form" action="/admin/dashboard" method="GET">
+                    <div class="filter-group">
+                        <label>Players:
+                            <select name="minPlayers">
+                                <option value="">All Games</option>
+                                <option value="1" <%= minPlayers === '1' ? 'selected' : '' %>>1+ Players</option>
+                                <option value="2" <%= minPlayers === '2' ? 'selected' : '' %>>2+ Players</option>
+                                <option value="3" <%= minPlayers === '3' ? 'selected' : '' %>>3+ Players</option>
+                                <option value="4" <%= minPlayers === '4' ? 'selected' : '' %>>Full Games</option>
+                            </select>
+                        </label>
+                        <label>Status:
+                            <select name="gameStatus">
+                                <option value="">All</option>
+                                <option value="active">Active Only</option>
+                                <option value="empty">Empty Only</option>
+                                <option value="full">Full Only</option>
+                            </select>
+                        </label>
+                        <button type="submit">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
             <div id="lastUpdated" class="last-updated">
                 Last updated: <%= moment.toLocaleTimeString() %>
             </div>
@@ -42,7 +66,6 @@
                     <% if (stats.mostActiveCreator) { %>
                         <%= stats.mostActiveCreator.nickname %> 
                         (<%= stats.mostActiveCreator.games %> games)
-                        <div class="user-id">ID: <%= stats.mostActiveCreator.userId %></div>
                     <% } else { %>
                         None
                     <% } %>
@@ -53,74 +76,65 @@
         <div class="data-tables">
             <section class="games-section">
                 <h2>Active Games</h2>
-                <form class="filter-form" action="/admin/dashboard" method="GET">
-                  <label>Filter by minimum players:
-                  <select name="minPlayers">
-                    <option value="">All</option>
-                    <option value="1" <%= minPlayers === '1' ? 'selected' : '' %>>1+</option>
-                    <option value="2" <%= minPlayers === '2' ? 'selected' : '' %>>2+</option>
-                    <option value="3" <%= minPlayers === '3' ? 'selected' : '' %>>3+</option>
-                    <option value="4" <%= minPlayers === '4' ? 'selected' : '' %>>4</option>
-                  </select>
-                  </label>
-                  <button type="submit">Filter</button>
-                </form>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Creator</th>
-                            <th>Creator ID</th>
-                            <th>Players</th>
-                            <th>Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% games.forEach(game => { %>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
                             <tr>
-                                <td><%= game.name %></td>
-                                <td><%= game.creatorNickname %></td>
-                                <td><small><%= game.creator %></small></td>
-                                <td>
-                                    <%= game.players.length %>/<%= game.maxPlayers %>
-                                    <div class="player-list">
-                                        <% game.players.forEach(player => { %>
-                                            <div class="player-item">
-                                                <%= player.nickname %>
-                                                <small>(ID: <%= player.userId %>)</small>
-                                            </div>
-                                        <% }); %>
-                                    </div>
-                                </td>
-                                <td><%= new Date(game.created).toLocaleString() %></td>
+                                <th>Name</th>
+                                <th>Creator</th>
+                                <th>Players</th>
+                                <th>Password</th>
+                                <th>Created</th>
                             </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% games.forEach(game => { %>
+                                <tr>
+                                    <td><%= game.name %></td>
+                                    <td><%= game.creatorNickname %></td>
+                                    <td>
+                                        <%= game.players.length %>/<%= game.maxPlayers %>
+                                        <div class="player-list">
+                                            <% game.players.forEach(player => { %>
+                                                <div class="player-item">
+                                                    <%= player.nickname %>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    </td>
+                                    <td><%= game.password ? '🔒' : '🔓' %></td>
+                                    <td><%= new Date(game.created).toLocaleString() %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
             </section>
 
             <section class="users-section">
                 <h2>Recent Users</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Username</th>
-                            <th>Nickname</th>
-                            <th>Joined</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% users.slice(-10).forEach(user => { %>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
                             <tr>
-                                <td><small><%= user.userId %></small></td>
-                                <td><%= user.username %></td>
-                                <td><%= user.nickname %></td>
-                                <td><%= new Date(user.createdAt).toLocaleString() %></td>
+                                <th>Username</th>
+                                <th>Nickname</th>
+                                <th>Status</th>
+                                <th>Joined</th>
                             </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% users.slice(-10).forEach(user => { %>
+                                <tr>
+                                    <td><%= user.username %></td>
+                                    <td><%= user.nickname %></td>
+                                    <td><%= user.deleted ? '❌ Deleted' : '✅ Active' %></td>
+                                    <td><%= new Date(user.createdAt).toLocaleString() %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </div>
     </div>

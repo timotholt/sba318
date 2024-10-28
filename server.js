@@ -49,6 +49,7 @@ app.use(requestLogger);
 
 // Static files
 app.use(express.static('public'));
+// app.use(express.static('public/admin'));
 app.use('/utils', express.static('utils'));
 
 // Routes
@@ -87,7 +88,7 @@ import { buildInfo } from './buildInfo.js';
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    
+
     // Build script doesn't work.  What was I thinking?
     // console.log(`Chat Server Version: ${buildInfo.version} (Built: ${buildInfo.buildDate})`);
 });
