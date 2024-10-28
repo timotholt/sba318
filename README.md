@@ -4,6 +4,11 @@ A real-time chat lobby system built with Node.js, Express, and a
 modular database system supporting both in-memory and MongoDB
 storage (don't get excited, cause the MongoDB part doesn't work actually).
 
+![Screenshot](login-screen.png)
+![Screenshot](registration-screen.png)
+![Screenshot](lobby-screen.png)
+![Screenshot](settings-screen.png)
+
 ## Launching the app:
 
 nodemon start
@@ -42,7 +47,7 @@ looks amazing!
 | Utilize route parameters, where appropriate. | 5% | ✅ |
 | Adhere to the guiding principles of REST. | 10% | ✅ |
 | Create and render at least one view using a view template and template engine. This can be a custom template engine or a third-party engine. | 8% | ✅ |
-| Use simple CSS to style the rendered views. | 2% |  |
+| Use simple CSS to style the rendered views. | 2% | ✅ |
 | Include a form within a rendered view that allows for interaction with your RESTful API. | 3%  | ✅ |
 | Utilize reasonable code organization practices. | 5% | ✅ |
 | Ensure that the program runs without errors (comment out things that do not work, and explain your blockers - you can still receive partial credit). | 10% | ✅ |
