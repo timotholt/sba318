@@ -12,25 +12,6 @@ But now SBA318 is what I wanted SBA316 to be, and even tho it's
 got a few weird bugs and stability issues, when it works it
 looks amazing!
 
-# The UI Style Sheets From Hell
-
-SBA308a (my cat project) I did all the CSS myself and it took
-almost about 5 days to get right and it was only like 80% of what
-I wanted. My mentor says nobody does CSS style sheets by hand
-anymore cause it's not a good use of time.
-
-So for SBA318 I decided I was NOT going to style every single border
-and color in this beautiful UI by hand.  I fed my index.html and my
-dashboard.ejs into a CSS builder and described what I wanted and blam,
-out came an amazing stylesheet.
-
-Except it wasn't so simple.  It took almost 3 days to get the UI to
-look as awesome as it was. Natural language CSS builders don't
-work out of the box.  What it gets right looks amazing... what it
-doesn't get right.. well... makes it impossible to debug. CSS builders
-don't spit out comments and have so many weird bugs with scroll bars, 
-etc., in the CSS I had to just go back to an older verison and try again.
-
 # Requirements
 
 | Requirement | Weight | Completed |
@@ -124,3 +105,22 @@ To add a new database engine:
 4. Add to `selectDbEngine.js`
 5. Update DB_TYPE in `.env`
 
+
+# The UI Style Sheets From Hell
+
+SBA308a (my cat project) I did all the CSS myself and it took
+almost about 5 days to get right and it was only like 80% of what
+I wanted. My mentor says nobody does CSS style sheets by hand
+anymore cause it's not a good use of time.
+
+So for SBA318 I decided I was NOT going to style every single border
+and color in this beautiful UI by hand.  I fed my index.html and my
+dashboard.ejs into a CSS builder and described what I wanted and blam,
+out came an amazing stylesheet.
+
+Except it wasn't so simple.  It took almost 3 days to get the UI to
+look as awesome as it was. Natural language CSS builders don't
+work out of the box.  What it gets right looks amazing... what it
+doesn't get right.. well... makes it impossible to debug. CSS builders
+don't spit out comments and have so many weird bugs with scroll bars, 
+etc., in the CSS I had to just go back to an older verison and try again.
